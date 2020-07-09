@@ -29,7 +29,7 @@ source update.sql;
 + job
 > job_id, com_id, pos_id, area_id
 + job_info
-> job_id, degree, low_salary, high_salary, exp_year, job_type, worktime, is_night, needed_number
+> job_id, job_name, degree, low_salary, high_salary, exp_year, job_type, worktime, is_night, needed_number
 + company
 > com_id, com_name, capital, emp_number, address
 + pos
