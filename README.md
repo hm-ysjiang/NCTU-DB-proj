@@ -24,3 +24,15 @@ source update.sql;
 
 ## Python 3rd party libs
 > pip install -r pip-requirements
+
+## Table Description
++ job
+> job_id, com_id, pos_id, area_id
++ job_info
+> job_id, degree, low_salary, high_salary, exp_year, job_type, worktime, is_night, needed_number
++ company
+> com_id, com_name, capital, emp_number, address
++ pos
+> pos_id, pos_name, pos_type
++ localarea
+> area_id, area_cc_name, area_td_name, area_cctd_name
