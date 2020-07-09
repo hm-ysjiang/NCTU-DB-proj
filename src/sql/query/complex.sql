@@ -1,5 +1,5 @@
 -- 透過 job_info 內的 constraint 搜尋職缺
--- Input Variables
+-- Input Variables :
 -- $NAM, $DEGREE, $SALARY,
 -- $EXP_YEAR, $JOB_TYPE, $WORKTIME_MIN, $WORKTIME_MAX, $IS_NIGHT, $NEEDED_NUMBER
 
@@ -18,7 +18,7 @@ FROM    joball
         INNER JOIN job_info
         USING job_id
 
-WHERE       (($NAM = NULL)          OR (JOB_NAME LIKE "%$NAM%")                         )
+WHERE       (($NAM = NULL)           OR (JOB_NAME LIKE "%$NAM%")                        )
         AND (($DEGREE = NULL)        OR ($DEGREE >= DEGREE)                             )
         AND (($EXP_YEAR = NULL)      OR ($EXP_YEAR >= EXP_YEAR)                         )
         AND (($WORKTIME_MIN = NULL)  OR ($WORKTIME_MIN <= WORKTIME)                     )
