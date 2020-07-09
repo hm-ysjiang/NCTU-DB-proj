@@ -36,3 +36,8 @@ source update.sql;
 > pos_id, pos_name, pos_type
 + localarea
 > area_id, area_cc_name, area_td_name, area_cctd_name
+
+## Functionality
++ 簡易查詢 : 職缺名稱/公司名稱 + 地區
++ 複合查詢
++ 反向分析
