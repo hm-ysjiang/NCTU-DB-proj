@@ -36,6 +36,11 @@ source update.sql;
 > pos_id, pos_name, pos_type
 + localarea
 > area_id, area_cc_name, area_td_name, area_cctd_name
++ Spec
+```
+is_night : 1(日班), 2(夜班), 3(都有)
+degree : 0(不拘), 1(國中以下), 2(高中/高職), 3(專科), 4(大學), 5(碩士), 6(博士)
+```
 
 ## Functionality
 + 簡易查詢 : 職缺名稱/公司名稱 + 地區
