@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup as Soup
 from datetime import datetime
-from pathlib import Path
 from selenium import webdriver
 import os
 import pandas as pd
@@ -10,8 +9,9 @@ import time
 import data
 
 
-# Driver Location
-DRIVER_PATH = r"C:\temp\selenium_chrome"
+# Path
+PATH = ''
+DRIVER_PATH = ''
 
 # Query Settings
 _url = 'https://www.1111.com.tw/search/job?d0={0}&fs=2&page='
@@ -24,10 +24,11 @@ driver = None
 t_job = []
 t_job_info = []
 t_company = []
-jid_map = {}
-cid_map = {}
-CAT_LIM = 200
+jid_map = set()
+cid_map = set()
+CAT_LIM = 60
 # CAT_LIM = None
+starttime = None
 
 
 def job_detail(jid):
@@ -66,6 +67,7 @@ def job_detail(jid):
                         start = float(_start[0]) + float(_start[1]) / 60
                         end = float(_end[0]) + float(_end[1]) / 60
                         duration = end - start
+                        duration = "%.2f" % abs(duration)
         except Exception as e:
             print(e)
             return {'ok': False, 'msg': 'Exception error'}
@@ -105,7 +107,7 @@ def comp_detail(cid):
                         emp = int(m.group())
         except Exception as e:
             print(e)
-        return {'cap': cap, 'addr': addr, 'emp': emp, 'phone': cid}
+        return {'cap': cap, 'addr': addr, 'emp': emp}
 
 
 def load_page(url, pid):
@@ -117,8 +119,9 @@ def load_page(url, pid):
 
         try:
             # Check not dup
-            raw_jid = int(soup.find('a', class_='position0Link')['href'][5:-1])
-            if raw_jid in jid_map.keys():
+            job_title = soup.find('a', class_='position0Link')
+            jid = int(job_title['href'][5:-1])
+            if jid in jid_map:
                 continue
 
             # Only get those dominant
@@ -152,29 +155,30 @@ def load_page(url, pid):
                 continue
 
             # Get Details
-            det = job_detail(raw_jid)
+            det = job_detail(jid)
             if not det['ok']:
                 print(f'Detail Fail: {det["msg"]}')
                 continue
 
             # Parse Degree
             raw_degree = needs.find_all('span')[3].text.split(',')
-            degree = 0
+            degree = 7
             for deg in raw_degree:
-                degree |= data.degree_bitmask.get(deg, 0)
+                degree = min(data.degree_bitmask.get(deg, 7), degree)
+            if degree == 7:
+                degree = 0
 
             # Set company
             com = soup.find('a', class_='d-block organ')
-            raw_cid = int(com['href'][6:-1])
-            if raw_cid not in cid_map.keys():
-                cid_map[raw_cid] = len(cid_map)
-                company = [len(cid_map)-1, com.text]
-                cdet = comp_detail(raw_cid)
+            cid = int(com['href'][6:-1])
+            if cid not in cid_map:
+                cid_map.add(cid)
+                company = [cid, com.text]
+                cdet = comp_detail(cid)
                 if cdet:
                     company.extend([cdet['cap'], cdet['emp'],
-                                    cdet['addr'], cdet['phone']])
+                                    cdet['addr']])
                 t_company.append(company)
-            cid = cid_map[raw_cid]
 
             # Parse exp years
             m = re.search(r'[0-9,]+', needs.find_all('span')[2].text)
@@ -182,13 +186,12 @@ def load_page(url, pid):
             if m:
                 exp = int(m.group())
 
-            jid_map[raw_jid] = len(jid_map)
-
-            job = [len(jid_map)-1, cid, pid, data.localarea[area]]
-            job_info = [len(jid_map)-1, degree, sal_l, sal_u,
-                        exp, parttime, det['duration'], det['time'], det['people'], raw_jid]
+            job = [jid, cid, pid, data.localarea[area]]
+            job_info = [jid, job_title['title'], degree, sal_l, sal_u,
+                        exp, parttime, det['duration'], det['time'], det['people']]
             t_job.append(job)
             t_job_info.append(job_info)
+            jid_map.add(jid)
             cnt += 1
         except Exception as e:
             print(e, end='\n================\n')
@@ -213,21 +216,20 @@ def run(d0):
         cnt += rc[1]
         if (not rc[0]) or (CAT_LIM and cnt >= CAT_LIM):
             break
-        print(f'{d0}: {cnt}')
         page += 1
 
 
 def dump():
+    global PATH
     # jbInfo
-    df = pd.DataFrame(t_job_info, columns=['job_id', 'degree', 'low_salary', 'high_salary',
-                                           'exp_year', 'job_type', 'worktime', 'isnight', 'needed_num', 'url'])
-    dir = f'fetch/1111/result'
+    df = pd.DataFrame(t_job_info, columns=['job_id', 'job_name', 'degree', 'low_salary', 'high_salary',
+                                           'exp_year', 'job_type', 'worktime', 'isnight', 'needed_num'])
+    dir = f'{PATH}/result'
     print(f"Dumped {dir + f'/jobinfo.csv'}")
     df.to_csv(dir + f'/jobinfo.csv', index=False, line_terminator='\n')
     # company
     df = pd.DataFrame(t_company, columns=[
-                      'com_id', 'com_name', 'capital', 'emp_num', 'addr', 'phone'])
-    dir = f'fetch/1111/result'
+                      'com_id', 'com_name', 'capital', 'emp_num', 'addr'])
     print(f"Dumped {dir + f'/company.csv'}")
     df.to_csv(dir + f'/company.csv', index=False, line_terminator='\n')
 
@@ -235,25 +237,25 @@ def dump():
 def dumpJb(posfield, posname):
     df = pd.DataFrame(t_job, columns=['job_id', 'com_id', 'pos_id', 'area_id'])
 
-    dir = f'fetch/1111/result/{posfield}'
+    dir = f'{PATH}/result/{posfield}'
     if not os.path.isdir(dir):
         os.makedirs(dir)
 
-    print(f"Dumped {dir + f'/{posname}.csv'}")
+    print(
+        f"Dumped {dir + f'/{posname}.csv'}, Elapsed time: {datetime.now() - starttime}")
     df.to_csv(dir + f'/{posname}.csv', index=False, line_terminator='\n')
     t_job.clear()
 
 
 if __name__ == '__main__':
-    if Path().absolute().parts[-2:] == ('NCTU-DB-proj', 'src'):
-        starttime = datetime.now()
-        driver = webdriver.Chrome(DRIVER_PATH+r'\chromedriver.exe')
-        for d0, (field, name) in data.d_fn.items():
-            run(d0)
-            dumpJb(field, name)
-        driver.close()
-        dump()
-        endtime = datetime.now()
-        print(f'Used time: {endtime - starttime}')
-    else:
-        print('You should run this in .../NCTU-DB-proj/src')
+    PATH = os.path.dirname(os.path.realpath(__file__))
+    DRIVER_PATH = PATH + '/../../chrome_driver'
+    starttime = datetime.now()
+    driver = webdriver.Chrome(DRIVER_PATH+r'\chromedriver.exe')
+    for d0, (field, name) in data.d_fn.items():
+        run(d0)
+        dumpJb(field, name)
+    driver.close()
+    dump()
+    endtime = datetime.now()
+    print(f'Used time: {endtime - starttime}')

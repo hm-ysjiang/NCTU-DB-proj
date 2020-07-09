@@ -7,4 +7,20 @@ A final term project repo in NCTU
     - **fetch** The crawlers to fetch raw data
     - **sql** SQL codes to update/query tables
 
-HII
+## MySQL Setup
+**Check your db encoding is utf8/utf8mb4**
+> cd src/sql
+
+Enter MySQL console
+```
+CREATE DATABASE db_final;
+source init.sql;
+```
+
+Update content
+```
+source update.sql;
+```
+
+## Python 3rd party libs
+> pip install -r pip-requirements
