@@ -29,16 +29,16 @@ source update.sql;
 + job
 > job_id, com_id, pos_id, area_id
 + job_info
-> job_id, job_name, degree, low_salary, high_salary, exp_year, job_type, worktime, is_night, needed_number
+> job_id, job_name, degree, low_salary, high_salary, exp_year, job_type, worktime, is_night, needed_num
 + company
-> com_id, com_name, capital, emp_number, address
+> com_id, com_name, capital, emp_number, addr
 + pos
 > pos_id, pos_name, pos_type
 + localarea
 > area_id, area_cc_name, area_td_name, area_cctd_name
 + Spec
 ```
-is_night : 1(日班), 2(夜班), 3(都有)
+isnight : 1(日班), 2(夜班), 3(都有)
 degree : 0(不拘), 1(國中以下), 2(高中/高職), 3(專科), 4(大學), 5(碩士), 6(博士)
 ```
 

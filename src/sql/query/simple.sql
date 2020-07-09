@@ -1,32 +1,31 @@
 -- 簡易查詢 : 職缺名稱/公司名稱 + 地區
 -- 假設 $NAME 和 $CC 和 $TD 是 input
 
--- Output 除了 job_info 還需要有什麼?
+-- Output 除了 jobinfo 還需要有什麼?
 
-SET @name = '經理', @cc = '臺北市', @td = '內湖區';
+-- 2020/7/10 : 幹不知道為啥出來是empty set
 
-SELECT  job_info.job_name AS JOB_NAME,
-        job_info.degree AS DEGREE,
-        job_info.low_salary AS LOW_SALARY,
-        job_info.high_salary AS HIGH_SALARY,
-        job_info.exp_year AS EXP_YEAR,
-        job_info.job_type AS JOB_TYPE,
-        job_info.worktime AS WORKTIME,
-        job_info.is_night AS IS_NIGHT,
-        job_info.needed_number AS NEEDED_NUMBER
+SET @name := '', @cc := '臺中市', @td := NULL;
 
-FROM    job_info
-        INNER JOIN
-                    (SELECT  joball.job_id
-                        FROM    joball
-                                INNER JOIN localarea
-                                USING area_id
+SELECT  jobinfo.job_name AS JOB_NAME,
+        jobinfo.degree AS DEGREE,
+        jobinfo.low_salary AS LOW_SALARY,
+        jobinfo.high_salary AS HIGH_SALARY,
+        jobinfo.exp_year AS EXP_YEAR,
+        jobinfo.job_type AS JOB_TYPE,
+        jobinfo.worktime AS WORKTIME,
+        jobinfo.is_night AS IS_NIGHT,
+        jobinfo.needed_num AS NEEDED_NUM
 
-                        WHERE       ((@cc = NULL) OR (@cc = localarea.area_cc_name))
+FROM    jobinfo, company,
+                        (SELECT  job.job_id
+                        FROM    job, localarea
+                                
+
+                        WHERE       job.area_id = localarea.area_id
+                                AND ((@cc = NULL) OR (@cc = localarea.area_cc_name))
                                 AND ((@td = NULL) OR (@td = localarea.area_td_name))
                     ) AS job
-        USING job_id
-
-WHERE      (job_info.job_name LIKE "%@name%")
-        OR (company.com_name LIKE "%@name%")
+WHERE   jobinfo.job_id=job.job_id
+        AND ((jobinfo.job_name LIKE "%@name%") OR (company.com_name LIKE "%@name%"))
 ;
