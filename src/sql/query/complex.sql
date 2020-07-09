@@ -3,6 +3,8 @@
 -- $NAM, $DEGREE, $SALARY,
 -- $EXP_YEAR, $JOB_TYPE, $WORKTIME_MIN, $WORKTIME_MAX, $IS_NIGHT, $NEEDED_NUMBER
 
+SET @name='經理', @degree=6, @salary=40000, @exp_year=NULL, @job_type=0,
+    @worktime_min=NULL, @worktime_max=NULL, @is_night=NULL, @needed_number=NULL;
 
 SELECT  job_info.job_name AS JOB_NAME,
         job_info.degree AS DEGREE,
@@ -18,15 +20,15 @@ FROM    joball
         INNER JOIN job_info
         USING job_id
 
-WHERE       (($NAM = NULL)           OR (JOB_NAME LIKE "%$NAM%")                        )
-        AND (($DEGREE = NULL)        OR ($DEGREE >= DEGREE)                             )
-        AND (($EXP_YEAR = NULL)      OR ($EXP_YEAR >= EXP_YEAR)                         )
-        AND (($WORKTIME_MIN = NULL)  OR ($WORKTIME_MIN <= WORKTIME)                     )
-        AND (($WORKTIME_MAX = NULL)  OR ($WORKTIME_MAX >= WORKTIME)                     )
-        AND (($IS_NIGHT = NULL)      OR ($IS_NIGHT = IS_NIGHT)                          )
-        AND (($NEEDED_NUMBER = NULL) OR ($NEEDED_NUMBER <= NEEDED_NUMBER)               )
-        AND (($JOB_TYPE = NULL)      OR ($JOB_TYPE = JOB_TYPE)                          )
+WHERE       ((@name = NULL)          OR (JOB_NAME LIKE "%@name%")                       )
+        AND ((@degree = NULL)        OR (@degree >= DEGREE)                             )
+        AND ((@exp_year = NULL)      OR (@exp_year >= EXP_YEAR)                         )
+        AND ((@worktime_min = NULL)  OR (@worktime_min <= WORKTIME)                     )
+        AND ((@worktime_max = NULL)  OR (@worktime_max >= WORKTIME)                     )
+        AND ((@is_night = NULL)      OR (@is_night = IS_NIGHT)                          )
+        AND ((@needed_number = NULL) OR (@needed_number <= NEEDED_NUMBER)               )
+        AND ((@job_type = NULL)      OR (@job_type = JOB_TYPE)                          )
 
-        AND (($SALARY = NULL)        OR                                                    -- 要馬沒有指定薪資
-             (($JOB_TYPE = JOB_TYPE) AND ($SALARY BETWEEN LOW_SALARY AND HIGH_SALARY))  )  -- 要馬要有設定type才能指定薪資
+        AND ((@salary = NULL)        OR                                                    -- 要馬沒有指定薪資
+             ((@job_type = JOB_TYPE) AND (@salary BETWEEN LOW_SALARY AND HIGH_SALARY))  )  -- 要馬要有設定type才能指定薪資
 ;

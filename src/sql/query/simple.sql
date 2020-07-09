@@ -1,7 +1,9 @@
 -- 簡易查詢 : 職缺名稱/公司名稱 + 地區
---假設 $NAME 和 $CC 和 $TD 是 input
+-- 假設 $NAME 和 $CC 和 $TD 是 input
 
 -- Output 除了 job_info 還需要有什麼?
+
+SET @name = '經理', @cc = '臺北市', @td = '內湖區';
 
 SELECT  job_info.job_name AS JOB_NAME,
         job_info.degree AS DEGREE,
@@ -20,11 +22,11 @@ FROM    job_info
                                 INNER JOIN localarea
                                 USING area_id
 
-                        WHERE       (($CC = NULL) OR ($CC = localarea.area_cc_name))
-                                AND (($TD = NULL) OR ($TD = localarea.area_td_name))
+                        WHERE       ((@cc = NULL) OR (@cc = localarea.area_cc_name))
+                                AND ((@td = NULL) OR (@td = localarea.area_td_name))
                     ) AS job
         USING job_id
 
-WHERE      (job_info.job_name LIKE "%$NAME%")
-        OR (company.com_name LIKE "%$NAME%")
+WHERE      (job_info.job_name LIKE "%@name%")
+        OR (company.com_name LIKE "%@name%")
 ;
