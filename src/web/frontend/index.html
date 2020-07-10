@@ -4,12 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Jobs</title>
-    <script src="./script/index.js"></script>
-    <link rel="stylesheet" href="./bootstrap/bootstrap.min.css">
+    <script src="./frontend/script/index.js"></script>
+    <link rel="stylesheet" href="./frontend/bootstrap/bootstrap.min.css">
 </head>
 
 <body>
-    <p>Hello world!</p>
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark" style="background-color: #E59C61; margin-bottom: 5;">
+        <a class="navbar-brand" href="#">Find Jobs</a>
+
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link">Job</a>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0" action="/logout" method="POST">
+                <button class="btn btn-danger my-2 my-sm-0" type="submit">Logout</button>
+            </form>
+        </div>
+    </nav>
+    <p id="content">Hello world!</p>
 </body>
 
 </html>

@@ -1,4 +1,4 @@
-let ws = new WebSocket('ws://localhost:3001')
+const ws = new WebSocket('ws://localhost:3001')
 
 ws.onopen = () => {
     console.log('Connected')
@@ -9,5 +9,6 @@ ws.onclose = () => {
 }
 
 ws.onmessage = evt => {
-    data = JSON.parse(evt.data)
+    // data = JSON.parse(evt.data)
+    document.getElementById("content").textContent = evt.data
 }

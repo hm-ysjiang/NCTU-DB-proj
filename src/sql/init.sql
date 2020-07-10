@@ -44,6 +44,26 @@ CREATE TABLE position (
     PRIMARY KEY (pos_id)
 );
 
+CREATE TABLE user (
+    username varchar(15) NOT NULL,
+    passwd char(64) NOT NULL,
+    PRIMARY KEY (username)
+);
+
+CREATE TABLE favorite (
+    username varchar(15) NOT NULL,
+    job_id int NOT NULL,
+    PRIMARY KEY (username)
+);
+
 LOAD data LOCAL INFILE './rawdata/position.csv' INTO TABLE position FIELDS TERMINATED by ',' ENCLOSED by '"' LINES TERMINATED by '\n' IGNORE 1 LINES;
 
 LOAD data LOCAL INFILE './rawdata/localareaname.csv' INTO TABLE localarea FIELDS TERMINATED by ',' ENCLOSED by '"' LINES TERMINATED by '\n' IGNORE 1 LINES;
+
+INSERT INTO
+    user (username, passwd)
+VALUES
+    (
+        "admin",
+        "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+    );

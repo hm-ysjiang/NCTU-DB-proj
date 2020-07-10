@@ -4,12 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Jobs</title>
-    <script src="./script/index.js"></script>
-    <link rel="stylesheet" href="./bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="../frontend/bootstrap/bootstrap.min.css">
 </head>
 
 <body>
-    <p>{$jid}</p>
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark" style="background-color: #E59C61; margin-bottom: 5;">
+        <a class="navbar-brand" href="#">Find Jobs</a>
+
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link">Job</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div style="width: 100%; display: inline-flex;">
+        <div style="width: 19%; margin: .5%"></div>
+        <div style="width: 59%; margin: .5%;">
+            <div style="width: 100%; display: inline-flex;">
+                <div style="width: 60%; background-color: aqua; border: 2;">
+                    <p>{$jid}</p>
+                </div>
+                <div style="width: 40%; background-color: blueviolet;">
+                    <p>{$jid}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
