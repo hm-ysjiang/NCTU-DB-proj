@@ -14,6 +14,7 @@ A final term project repo in NCTU
 Enter MySQL console
 ```
 CREATE DATABASE db_final;
+use db_final;
 source init.sql;
 ```
 
