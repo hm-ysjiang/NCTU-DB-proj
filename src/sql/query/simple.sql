@@ -21,8 +21,8 @@ FROM    jobinfo, company, (
                                 SELECT  job.job_id, job.com_id
                                 FROM    job, localarea
                                 WHERE       job.area_id = localarea.area_id
-                                        AND (IFNULL(@cc, 1) OR (@cc = localarea.area_cc_name)) -- IFNULL(var, value) : if var is null then return value, else return var
-                                        AND (IFNULL(@td, 1) OR (@td = localarea.area_td_name)) -- 不能寫 var=NULL (expression)
+                                        AND (@cc is NULL) OR (@cc = localarea.area_cc_name)) -- 判斷是否是NULL要用 "is NULL"
+                                        AND (@td is NULL) OR (@td = localarea.area_td_name)) -- 不能用 "= NULL"
                                 ) AS job
 WHERE   jobinfo.job_id = job.job_id
         AND job.com_id = company.com_id
