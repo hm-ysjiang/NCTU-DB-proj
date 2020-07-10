@@ -1,9 +1,8 @@
--- 透過 jobinfo 內的 constraint 搜尋職缺
--- Input Variables :
--- $NAM, $DEGREE, $SALARY,
--- $EXP_YEAR, $JOB_TYPE, $WORKTIME_MIN, $WORKTIME_MAX, $IS_NIGHT, $NEEDED_NUMBER
+-- 複合查詢 : 透過 jobinfo 內的 constraint 搜尋職缺
 
+-- log
 -- 2020/7/10 : 幹你娘這個出來也是empty set
+-- 2020/7/10 : 基於jobinfo 的查詢可以run了
 
 SET @name = '經理', @degree = 6, @salary = 100000, @exp_year = NULL, @job_type = 0,
     @worktime_min = NULL, @worktime_max = NULL, @is_night = NULL, @needed_num = NULL;
