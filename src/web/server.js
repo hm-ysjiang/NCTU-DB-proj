@@ -30,7 +30,7 @@ wss.on('connection', ws => {
 app.use('/frontend', express.static(__dirname + '/frontend'));
 app.use(session({
     secret: 'NCTUCS-DB-Final',
-    cookie: { maxAge: 600000 },
+    maxAge: 600000,
     resave: false,
     saveUninitialized: true
 }))
@@ -39,8 +39,32 @@ app.use(bodyparser.urlencoded({ extended: false }))
 app.get('/', (req, res) => {
     if (!req.session.username)
         res.redirect('/login')
+    else {
+        helper.renderUserMainPage(req.session.username, (err, html) => {
+            res.send(html)
+        })
+    }
+})
+
+app.get('/basic', (req, res) => {
+    if (!req.session.username)
+        res.redirect('/login')
     else
-        res.sendFile(__dirname + '/frontend/index.html')
+        res.sendFile(__dirname + '/frontend/basic.html')
+})
+
+app.get('/advance', (req, res) => {
+    if (!req.session.username)
+        res.redirect('/login')
+    else
+        res.sendFile(__dirname + '/frontend/advance.html')
+})
+
+app.get('/statistic', (req, res) => {
+    if (!req.session.username)
+        res.redirect('/login')
+    else
+        res.sendFile(__dirname + '/frontend/statistic.html')
 })
 
 app.get('/job/:jid', (req, res) => {
@@ -59,7 +83,7 @@ app.get('/comp/:cid', (req, res) => {
     if (!req.session.username)
         res.redirect('/login')
     else
-        helper.render(__dirname + '/frontend/comp.html', {
+        helper.renderFile(__dirname + '/frontend/comp.html', {
             cid: req.params.cid
         }, (err, html) => {
             res.send(html)
@@ -70,14 +94,22 @@ app.get('/login', (req, res) => {
     if (req.session.username)
         res.redirect('/')
     else
-        res.sendFile(__dirname + '/frontend/login.html')
+        helper.renderFile(__dirname + '/frontend/login.html', {
+            err: ''
+        }, (err, html) => {
+            res.send(html)
+        })
 })
 
 app.get('/register', (req, res) => {
     if (req.session.username)
         res.redirect('/')
     else
-        res.sendFile(__dirname + '/frontend/register.html')
+        helper.renderFile(__dirname + '/frontend/register.html', {
+            err: ''
+        }, (err, html) => {
+            res.send(html)
+        })
 })
 
 app.post('/login', (req, res) => {
@@ -91,14 +123,20 @@ app.post('/login', (req, res) => {
                 res.redirect('/')
             }
             else {
-                console.log('Invalid user info')
-                res.redirect(req.originalUrl)
+                helper.renderFile(__dirname + '/frontend/login.html', {
+                    err: 'Incorrect username/passwd'
+                }, (err, html) => {
+                    res.send(html)
+                })
             }
         })
     }
     else {
-        console.log('Invalid user info')
-        res.redirect(req.originalUrl)
+        helper.renderFile(__dirname + '/frontend/login.html', {
+            err: 'Invalid tokens'
+        }, (err, html) => {
+            res.send(html)
+        })
     }
 })
 
@@ -111,15 +149,28 @@ app.post('/register', (req, res) => {
     username = req.body.username
     passwd = req.body.passwd
     passwdcheck = req.body.passwdcheck
-    if (username.length > 15 || passwd != passwdcheck) {
-        console.log('Invalid user info')
-        res.redirect(req.originalUrl)
+    if (username.length > 15) {
+        helper.renderFile(__dirname + '/frontend/register.html', {
+            err: 'Username too long'
+        }, (err, html) => {
+            res.send(html)
+        })
+    }
+    else if (passwd != passwdcheck) {
+        helper.renderFile(__dirname + '/frontend/register.html', {
+            err: 'The passwords are inconsistent'
+        }, (err, html) => {
+            res.send(html)
+        })
     }
     else if (helper.isValidUserInfo(username, passwd)) {
         helper.ifHasUser(username, hasuser => {
             if (hasuser) {
-                console.log('Username already exists')
-                res.redirect(req.originalUrl)
+                helper.renderFile(__dirname + '/frontend/register.html', {
+                    err: 'Username already exists'
+                }, (err, html) => {
+                    res.send(html)
+                })
             }
             else {
                 helper.registerNewUser(username, helper.getHashedPasswd(passwd))
@@ -130,9 +181,19 @@ app.post('/register', (req, res) => {
         })
     }
     else {
-        console.log('Invalid user info')
-        res.redirect(req.originalUrl)
+        helper.renderFile(__dirname + '/frontend/register.html', {
+            err: 'Invalid tokens'
+        }, (err, html) => {
+            res.send(html)
+        })
     }
+})
+
+app.post('/delfav', (req, res) => {
+    username = req.session.username
+    jid = req.body.jid
+    helper.removeFavFromUser(username, jid)
+    res.redirect('/')
 })
 
 app.listen(3000, () => {

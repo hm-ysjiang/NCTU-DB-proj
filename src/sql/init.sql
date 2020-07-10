@@ -52,8 +52,7 @@ CREATE TABLE user (
 
 CREATE TABLE favorite (
     username varchar(15) NOT NULL,
-    job_id int NOT NULL,
-    PRIMARY KEY (username)
+    job_id int NOT NULL
 );
 
 LOAD data LOCAL INFILE './rawdata/position.csv' INTO TABLE position FIELDS TERMINATED by ',' ENCLOSED by '"' LINES TERMINATED by '\n' IGNORE 1 LINES;

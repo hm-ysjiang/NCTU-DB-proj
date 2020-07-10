@@ -5,25 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Jobs</title>
     <script src="./frontend/script/index.js"></script>
+    <script src="./frontend/jquery/jquery-3.4.1.min.js"></script>
+    <script src="./frontend/bootstrap/bootstrap.min.js"></script>
     <link rel="stylesheet" href="./frontend/bootstrap/bootstrap.min.css">
+    <style>
+        .job-block {
+            margin-top: 2;
+            width: 100%;
+        }
+
+        .cont-block {
+            border-width: .8;
+            border-color: #97BDDF;
+            border-style: solid !important;
+            text-align: center;
+            padding-bottom: 2;
+        }
+
+        .cont-block-title {
+            background-color: #97BDDF;
+            color: white;
+            padding-left: 10;
+            padding-bottom: 2;
+            width: 100%;
+        }
+    </style>
 </head>
 
 <body>
-    <nav class="navbar sticky-top navbar-expand-lg navbar-dark" style="background-color: #E59C61; margin-bottom: 5;">
-        <a class="navbar-brand" href="#">Find Jobs</a>
+    <nav class="navbar sticky-top navbar-expand-sm navbar-dark" style="background-color: #E59C61; margin-bottom: 5;">
+        <a class="navbar-brand" disabled>Find Jobs</a>
 
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link">Job</a>
+                <li class="nav-item">
+                    <a class="nav-link" style="cursor: pointer;" href="/basic">簡易</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" style="cursor: pointer;" href="/advance">進階</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" style="cursor: pointer;" href="/statistic">統計</a>
                 </li>
             </ul>
             <form class="form-inline my-2 my-lg-0" action="/logout" method="POST">
-                <button class="btn btn-danger my-2 my-sm-0" type="submit">Logout</button>
+                <button class="btn btn-danger my-2 my-sm-0" type="submit">登出</button>
             </form>
         </div>
     </nav>
-    <p id="content">Hello world!</p>
+
+    <div style="margin: 0 auto; width: 60%; margin-top: 10;">
+        <div style="display: inline-flex; width: 100%; justify-content: space-between;">
+            <h3><label><strong>最愛列表</strong></label></h3>
+            <div style="display: ${toggle-block_none}">
+                <a class="btn btn-primary" data-toggle="collapse" href="#collapse-fav-detail" role="button"
+                    aria-expanded="false" aria-controls="collapse-fav-detail">切換全部 / 部分</a>
+            </div>
+        </div>
+        <div style="border-radius: .5rem; background-color: aliceblue; padding-top: 8; padding-bottom: 8;">
+            <div style="margin: 0 auto; width: 90%;">
+                <div class="job-block">
+                    <div style="display: inline-flex; width: 100%">
+                        <div class="cont-block-title">
+                            職缺名稱
+                        </div>
+                    </div>
+                    <div style="display: inline-flex; width: 100%">
+                        <div class="cont-block" style="width: 100%; min-width: fit-content;padding: 0 3;">
+                            職位類型 / 職位名稱
+                        </div>
+                        <div class="cont-block" style="min-width: 120;">
+                            薪水待遇
+                        </div>
+                        <div class="cont-block" style="min-width: 120;">
+                            工作地區
+                        </div>
+                        <div class="cont-block" style="min-width: 75;">
+                            移除最愛
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="query-fav" style="margin: 0 auto; width: 90%;">
+                ${query-fav}
+            </div>
+            <div class="collapse" id="collapse-fav-detail">
+                <div id="query-fav-detail" style="margin: 0 auto; width: 90%;">
+                    ${query-fav-detail}
+                </div>
+            </div>
+        </div>
+        <hr>
+        <h3><label><strong>推薦列表</strong></label></h3>
+        <div style="border-radius: .5rem; background-color: aliceblue;">
+            <p><br><br><br></p>
+        </div>
+    </div>
+
+    <nav class="navbar fixed-bottom navbar-light bg-light" style="padding-top: 0; padding-bottom: 0;">
+        <ul class=" navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" id="content"></a>
+            </li>
+        </ul>
+    </nav>
 </body>
 
 </html>
