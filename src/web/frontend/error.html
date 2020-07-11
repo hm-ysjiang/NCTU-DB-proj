@@ -4,11 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Jobs</title>
-    <link rel="stylesheet" href="../frontend/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/frontend/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/frontend/content.css">
 </head>
 
 <body>
-    <p>Unfortunately, the page you requested is currently unavailable.</p>
+    <nav class="navbar sticky-top navbar-expand-sm navbar-dark" style="background-color: #E59C61; margin-bottom: 5;">
+        <a class="navbar-brand" href="/">Find Jobs</a>
+
+        <div class="collapse navbar-collapse" id="narbar">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item" style="font-weight: bolder;">
+                    <a class="nav-link" style="cursor: pointer;" href="/basic">簡易</a>
+                </li>
+                <li class="nav-item" style="font-weight: bolder;">
+                    <a class="nav-link" style="cursor: pointer;" href="/advance">進階</a>
+                </li>
+                <li class="nav-item" style="font-weight: bolder;">
+                    <a class="nav-link" style="cursor: pointer;" href="/statistic">統計</a>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0" action="/logout" method="POST">
+                <button class="btn my-2 my-sm-0 btn-logout" type="submit">登出</button>
+            </form>
+        </div>
+    </nav>
+    <div style="margin: 0 auto; width: 60%; margin-top: 10; margin-bottom: 64;">
+        <div
+            style="border-radius: .5rem; background-color: #c4c4c4; padding-top: 8; padding-bottom: 8; text-align: center; margin-top: 20;">
+            <p><span style="font-size: 400%; font-weight: bolder;"><label>Sorry</label></span><br>
+                <span style="font-size: 120%; font-weight: bold;">The page you request doesn't exist or is not available
+                    now</span></p>
+        </div>
+    </div>
 </body>
 
 </html>

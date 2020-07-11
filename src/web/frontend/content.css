@@ -1,0 +1,38 @@
+body {
+    background-color: #f4f4f4;
+}
+
+.job-block {
+    margin-top: 2;
+    width: 100%;
+}
+
+.cont-block {
+    border-width: .8;
+    border-color: #97BDDF;
+    border-style: solid !important;
+    text-align: center;
+    padding-bottom: 2;
+}
+
+.cont-block-title {
+    background-color: #97BDDF;
+    color: white;
+    padding-left: 10;
+    padding-right: 10;
+    padding-bottom: 2;
+    width: 100%;
+}
+
+.btn-logout {
+    color: white;
+    font-weight: bold;
+    border-color: #F05914;
+    background-color: #F05914;
+}
+
+.btn-logout:hover {
+    color: white;
+    border-color: #E54F0A;
+    background-color: #E54F0A;
+}

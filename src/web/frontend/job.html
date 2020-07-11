@@ -4,35 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Jobs</title>
-    <link rel="stylesheet" href="../frontend/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/frontend/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/frontend/content.css">
+    <style>
+        body {
+            background-color: #f4f4f4;
+        }
+
+        .continfo-block {
+            border-width: .8;
+            border-color: #97BDDF;
+            border-style: solid !important;
+            text-align: center;
+            padding-bottom: 2;
+        }
+
+        .continfo-block-title {
+            background-color: #97BDDF;
+            color: white;
+            padding-left: 10;
+            padding-right: 10;
+            padding-bottom: 2;
+            width: 100%;
+            font-size: 24;
+            font-weight: bold;
+        }
+    </style>
 </head>
 
 <body>
-    <nav class="navbar sticky-top navbar-expand-lg navbar-dark" style="background-color: #E59C61; margin-bottom: 5;">
-        <a class="navbar-brand" href="#">Find Jobs</a>
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark" style="background-color: #E59C61;">
+        <a class="navbar-brand" href="/">Find Jobs</a>
 
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link">Job</a>
+                <li class="nav-item" style="font-weight: bolder;">
+                    <a class="nav-link" style="cursor: pointer;" href="/basic">簡易</a>
+                </li>
+                <li class="nav-item" style="font-weight: bolder;">
+                    <a class="nav-link" style="cursor: pointer;" href="/advance">進階</a>
+                </li>
+                <li class="nav-item" style="font-weight: bolder;">
+                    <a class="nav-link" style="cursor: pointer;" href="/statistic">統計</a>
+                </li>
+                <li class="nav-item active" style="font-weight: bolder;">
+                    <a class="nav-link">職缺</a>
                 </li>
             </ul>
+            <form class="form-inline my-2 my-lg-0" action="/logout" method="POST">
+                <button class="btn my-2 my-sm-0 btn-logout" type="submit">登出</button>
+            </form>
         </div>
     </nav>
 
-    <div style="width: 100%; display: inline-flex;">
-        <div style="width: 19%; margin: .5%"></div>
-        <div style="width: 59%; margin: .5%;">
-            <div style="width: 100%; display: inline-flex;">
-                <div style="width: 60%; background-color: aqua; border: 2;">
-                    <p>{$jid}</p>
+    <div style="margin: 0 auto; width: 70%; margin-bottom: 64; padding: 20 32; background-color: white;">
+        <div style="width: 100%; display: inline-flex;">
+            <div class="job-block">
+                <div style="display: inline-flex; width: 100%">
+                    <div class="continfo-block-title">
+                        <a href="https://www.1111.com.tw/job/${job_id}/"
+                            style="color:white; text-decoration: none;">${job_name}</a>
+                    </div>
                 </div>
-                <div style="width: 40%; background-color: blueviolet;">
-                    <p>{$jid}</p>
+                <div style="display: inline-flex; width: 100%">
+                    <div class="continfo-block" style="width: 100%; min-width: fit-content;padding: 0 3;"><a
+                            href="/comp/${com_id}"
+                            style="color:black; text-decoration: none; font-weight: bold;">${com_name}</a>
+                    </div>
+                    <div class="continfo-block" style="min-width: 100;">
+                        需求 ${needed_num} 名
+                    </div>
+                </div>
+                <div style="display: inline-flex; width: 100%">
+                    <div class="continfo-block" style="width: 100%; min-width: fit-content;padding: 0 3;">
+                        ${salary_unit}薪 ${low_salary} ~ ${high_salary}元
+                    </div>
+                    <div class="continfo-block" style="min-width: 60;">
+                        ${job_type}
+                    </div>
+                    <div class="continfo-block" style="min-width: 90;">
+                        ${is_night}
+                    </div>
+                    <div class="continfo-block" style="min-width: 125;">
+                        工時：${worktime}小時
+                    </div>
+                </div>
+                <div style="display: inline-flex; width: 100%">
+                    <div class="continfo-block" style="width: 100%; min-width: fit-content;padding: 0 3;">
+                        ${pos_field} / ${pos_name}
+                    </div>
+                    <div class="continfo-block" style="min-width: 125;">
+                        ${area_cctd_name}
+                    </div>
+                    <div class="continfo-block" style="min-width: 75;">
+                        ${degree}
+                    </div>
+                    <div class="continfo-block" style="min-width: 50;">
+                        ${exp_year}
+                    </div>
+                    <div class="continfo-block" style="min-width: 90; max-height: 28;">
+                        <form action="/${action}" method="POST" style="margin-bottom: 0;">
+                            <input type="hidden" name="jid" value="${job_id}">
+                            <button class="badge badge-pill badge-danger"
+                                style="background-color: #E43AEE; border-color: #E43AEE; margin-top: 2;">${action_desc}最愛</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
 </body>
 

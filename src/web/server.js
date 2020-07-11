@@ -40,6 +40,7 @@ app.get('/', (req, res) => {
     if (!req.session.username)
         res.redirect('/login')
     else {
+        req.session.prevUrl = '/'
         helper.renderUserMainPage(req.session.username, (err, html) => {
             res.send(html)
         })
@@ -49,29 +50,36 @@ app.get('/', (req, res) => {
 app.get('/basic', (req, res) => {
     if (!req.session.username)
         res.redirect('/login')
-    else
+    else {
+        req.session.prevUrl = '/basic'
         res.sendFile(__dirname + '/frontend/basic.html')
+    }
 })
 
 app.get('/advance', (req, res) => {
     if (!req.session.username)
         res.redirect('/login')
-    else
+    else {
+        req.session.prevUrl = '/advance'
         res.sendFile(__dirname + '/frontend/advance.html')
+    }
 })
 
 app.get('/statistic', (req, res) => {
     if (!req.session.username)
         res.redirect('/login')
-    else
+    else {
+        req.session.prevUrl = '/statistic'
         res.sendFile(__dirname + '/frontend/statistic.html')
+    }
 })
 
 app.get('/job/:jid', (req, res) => {
     if (!req.session.username)
         res.redirect('/login')
     else
-        helper.renderJobPageAndThen(req.params.jid, (err, html) => {
+        helper.renderJobPage(req.params.jid, (err, html) => {
+            req.session.prevUrl = '/job/' + req.params.jid
             if (err)
                 res.sendFile(__dirname + '/frontend/error.html')
             else
@@ -86,6 +94,7 @@ app.get('/comp/:cid', (req, res) => {
         helper.renderFile(__dirname + '/frontend/comp.html', {
             cid: req.params.cid
         }, (err, html) => {
+            req.session.prevUrl = '/comp/' + req.params.cid
             res.send(html)
         })
 })
@@ -189,11 +198,24 @@ app.post('/register', (req, res) => {
     }
 })
 
+app.post('/addfav', (req, res) => {
+    username = req.session.username
+    jid = req.body.jid
+    helper.addFavToUser(username, jid)
+    if (req.session.prevUrl)
+        res.redirect(req.session.prevUrl)
+    else
+        res.redirect('/')
+})
+
 app.post('/delfav', (req, res) => {
     username = req.session.username
     jid = req.body.jid
     helper.removeFavFromUser(username, jid)
-    res.redirect('/')
+    if (req.session.prevUrl)
+        res.redirect(req.session.prevUrl)
+    else
+        res.redirect('/')
 })
 
 app.listen(3000, () => {
