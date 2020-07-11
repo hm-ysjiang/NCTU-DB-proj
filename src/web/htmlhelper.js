@@ -18,20 +18,20 @@ module.exports = {
             callback(null, data);
         })
     },
-    render: function (html, params) {
+    renderString: function (str, params) {
         for (key in params) {
             if (params[key])
-                html = html.split('${' + key + '}').join(params[key]);
+                str = str.split('${' + key + '}').join(params[key]);
             else
-                html = html.split('${' + key + '}').join('');
+                str = str.split('${' + key + '}').join('');
         }
-        return html
+        return str
     },
     renderFile: function (filename, params, callback) {
         this.readFile(filename, (err, html) => {
             if (err)
                 return callback(err)
-            callback(null, this.render(html, params))
+            callback(null, this.renderString(html, params))
         })
     },
     renderJobPageAndThen: function (jid, callback) {
@@ -58,37 +58,37 @@ module.exports = {
     getHashedPasswd: function (passwd) {
         return crypto.createHash('sha256').update(passwd).digest('hex')
     },
-    ifIsRegisteredUser: function (username, passwd, callback) {
-        db.query('SELECT * FROM user WHERE username = "' + username + '" AND passwd = "' + passwd + '";', (err, res, fields) => {
+    ifUserRegistered: function (username, passwd, callback) {
+        db.query(this.renderString(this.query_strings.validateUserPassword, { 'username': username, 'passwd': passwd }), (err, res, fields) => {
             if (err)
                 return callback(false)
             callback(res.length > 0)
         })
     },
     ifHasUser: function (username, callback) {
-        db.query('SELECT * FROM user WHERE username = "' + username + '";', (err, res, fields) => {
+        db.query(this.renderString(this.query_strings.userExist, { 'username': username }), (err, res, fields) => {
             if (err)
                 return callback(false)
             callback(res.length > 0)
         })
     },
     registerNewUser: function (username, passwd) {
-        db.query('INSERT INTO user (username, passwd) VALUES ("' + username + '", "' + passwd + '");', (err, res, fields) => { })
+        db.query(this.renderString(this.query_strings.newUser, { 'username': username, 'passwd': passwd }), (err, res, fields) => { })
     },
     renderUserMainPage: function (username, callback) {
         this.readFile(__dirname + '/frontend/index.html', (err, html) => {
             if (err)
                 return callback(err)
-            db.query('SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, t.area_cctd_name, p.pos_field, p.pos_name FROM ( SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, l.area_cctd_name, t.pos_id FROM ( SELECT t.job_id, j.job_name, j.low_salary, j.high_salary, t.area_id, t.pos_id FROM ( SELECT j.job_id, j.area_id, j.pos_id FROM job j, favorite f WHERE f.username = "' + username + '" AND j.job_id = f.job_id) AS t, jobinfo j WHERE j.job_id = t.job_id ) AS t, localarea AS l WHERE t.area_id = l.area_id ) AS t, position p WHERE t.pos_id = p.pos_id;', (err, res, fields) => {
+            this.readFile(__dirname + '/frontend/component/job-block.html', (err, component) => {
                 if (err)
                     return callback(err)
-                this.readFile(__dirname + '/frontend/component/job-block.html', (err, component) => {
+                db.query(this.renderString(this.query_strings.getUserFavInfo, { 'username': username }), (err, res, fields) => {
                     if (err)
                         return callback(err)
                     if (res.length <= 5) {
                         fav = ''
                         for (row in res) {
-                            fav += this.render(component, {
+                            fav += this.renderString(component, {
                                 'job_name': res[row].job_name,
                                 'pos_field': res[row].pos_field,
                                 'pos_name': res[row].pos_name,
@@ -98,13 +98,30 @@ module.exports = {
                                 'job_id': res[row].job_id
                             })
                         }
-                        callback(null, this.render(html, { 'query-fav': fav, 'query-fav-detail': '', 'toggle-block_none': 'none' }))
+                        this.readFile(__dirname + '/frontend/component/job-block-suggest.html', (err, component2) => {
+                            if (err)
+                                return callback(err)
+                            db.query(this.renderString(this.query_strings.suggestion, { 'username': username }), (err, res, fields) => {
+                                sug = ''
+                                for (row in res) {
+                                    sug += this.renderString(component2, {
+                                        'job_name': res[row].job_name,
+                                        'pos_field': res[row].pos_field,
+                                        'pos_name': res[row].pos_name,
+                                        'lo_sal': res[row].low_salary,
+                                        'hi_sal': res[row].high_salary,
+                                        'area_cctd': res[row].area_cctd_name
+                                    })
+                                }
+                                callback(null, this.renderString(html, { 'query-fav': fav, 'query-fav-detail': '', 'toggle-block_none': 'none', 'query-suggest': sug }))
+                            })
+                        })
                     }
                     else {
                         fav = ''
                         fav_detail = ''
                         for (row = 0; row < 4; row++) {
-                            fav += this.render(component, {
+                            fav += this.renderString(component, {
                                 'job_name': res[row].job_name,
                                 'pos_field': res[row].pos_field,
                                 'pos_name': res[row].pos_name,
@@ -115,7 +132,7 @@ module.exports = {
                             })
                         }
                         for (row = 4; row < res.length; row++) {
-                            fav_detail += this.render(component, {
+                            fav_detail += this.renderString(component, {
                                 'job_name': res[row].job_name,
                                 'pos_field': res[row].pos_field,
                                 'pos_name': res[row].pos_name,
@@ -125,7 +142,24 @@ module.exports = {
                                 'job_id': res[row].job_id
                             })
                         }
-                        callback(null, this.render(html, { 'query-fav': fav, 'query-fav-detail': fav_detail, 'toggle-block_none': 'block' }))
+                        this.readFile(__dirname + '/frontend/component/job-block-suggest.html', (err, component2) => {
+                            if (err)
+                                return callback(err)
+                            db.query(this.renderString(this.query_strings.suggestion, { 'username': username }), (err, res, fields) => {
+                                sug = ''
+                                for (row in res) {
+                                    sug += this.renderString(component2, {
+                                        'job_name': res[row].job_name,
+                                        'pos_field': res[row].pos_field,
+                                        'pos_name': res[row].pos_name,
+                                        'lo_sal': res[row].low_salary,
+                                        'hi_sal': res[row].high_salary,
+                                        'area_cctd': res[row].area_cctd_name
+                                    })
+                                }
+                                callback(null, this.renderString(html, { 'query-fav': fav, 'query-fav-detail': fav_detail, 'toggle-block_none': 'block', 'query-suggest': sug }))
+                            })
+                        })
                     }
                 })
             })
@@ -133,5 +167,13 @@ module.exports = {
     },
     removeFavFromUser: function (username, jid) {
         db.query('DELETE FROM favorite WHERE username = "' + username + '" AND job_id = "' + jid + '";')
+    }
+    ,
+    query_strings: {
+        getUserFavInfo: 'SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, t.area_cctd_name, p.pos_field, p.pos_name FROM ( SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, l.area_cctd_name, t.pos_id FROM ( SELECT t.job_id, j.job_name, j.low_salary, j.high_salary, t.area_id, t.pos_id FROM ( SELECT j.job_id, j.area_id, j.pos_id FROM job j, favorite f WHERE f.username = "${username}" AND j.job_id = f.job_id) AS t, jobinfo j WHERE j.job_id = t.job_id ) AS t, localarea AS l WHERE t.area_id = l.area_id ) AS t, position p WHERE t.pos_id = p.pos_id;',
+        validateUserPassword: 'SELECT * FROM user WHERE username = "${username}" AND passwd = "${passwd}";',
+        userExist: 'SELECT * FROM user WHERE username = "${username}";',
+        newUser: 'INSERT INTO user (username, passwd) VALUES ("${username}", "${passwd}");',
+        suggestion: 'SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, t.area_cctd_name, p.pos_field, p.pos_name FROM ( SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, l.area_cctd_name, t.pos_id FROM ( SELECT t.job_id, j.job_name, j.low_salary, j.high_salary, t.area_id, t.pos_id FROM (SELECT j.job_id, j.area_id, j.pos_id FROM job j WHERE j.pos_id IN (SELECT pos_id FROM (SELECT p.pos_id, COUNT(*) AS cnt FROM favorite f, job j, position p WHERE f.username = "${username}" AND f.job_id = j.job_id AND j.pos_id = p.pos_id GROUP BY p.pos_id ORDER BY cnt DESC LIMIT 3) AS t) AND j.job_id NOT IN (SELECT j.job_id FROM favorite f, job j WHERE f.username = "${username}" AND f.job_id = j.job_id) ORDER BY RAND() LIMIT 10) AS t, jobinfo j WHERE j.job_id = t.job_id ) AS t, localarea AS l WHERE t.area_id = l.area_id ) AS t, position p WHERE t.pos_id = p.pos_id;'
     }
 }

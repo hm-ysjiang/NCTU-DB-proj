@@ -116,7 +116,7 @@ app.post('/login', (req, res) => {
     username = req.body.username
     passwd = req.body.passwd
     if (helper.isValidUserInfo(username, passwd)) {
-        helper.ifIsRegisteredUser(username, helper.getHashedPasswd(passwd), isuser => {
+        helper.ifUserRegistered(username, helper.getHashedPasswd(passwd), isuser => {
             if (isuser) {
                 console.log('Welcome, ' + username)
                 req.session.username = username
