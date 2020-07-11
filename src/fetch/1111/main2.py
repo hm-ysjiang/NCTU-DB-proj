@@ -26,9 +26,10 @@ t_job_info = []
 t_company = []
 jid_map = set()
 cid_map = set()
-CAT_LIM = 60
+CAT_LIM = 120
 # CAT_LIM = None
 starttime = None
+TIMESTAMP = ''
 
 
 def job_detail(jid):
@@ -224,7 +225,7 @@ def dump():
     # jbInfo
     df = pd.DataFrame(t_job_info, columns=['job_id', 'job_name', 'degree', 'low_salary', 'high_salary',
                                            'exp_year', 'job_type', 'worktime', 'isnight', 'needed_num'])
-    dir = f'{PATH}/result'
+    dir = f'{PATH}/result/{TIMESTAMP}'
     print(f"Dumped {dir + f'/jobinfo.csv'}")
     df.to_csv(dir + f'/jobinfo.csv', index=False, line_terminator='\n')
     # company
@@ -237,7 +238,7 @@ def dump():
 def dumpJb(posfield, posname):
     df = pd.DataFrame(t_job, columns=['job_id', 'com_id', 'pos_id', 'area_id'])
 
-    dir = f'{PATH}/result/{posfield}'
+    dir = f'{PATH}/result/{TIMESTAMP}/{posfield}'
     if not os.path.isdir(dir):
         os.makedirs(dir)
 
@@ -251,6 +252,8 @@ if __name__ == '__main__':
     PATH = os.path.dirname(os.path.realpath(__file__))
     DRIVER_PATH = PATH + '/../../chrome_driver'
     starttime = datetime.now()
+    TIMESTAMP = str(starttime.month).zfill(2) + str(starttime.day).zfill(2) + \
+        str(starttime.hour).zfill(2) + str(starttime.minute).zfill(2)
     driver = webdriver.Chrome(DRIVER_PATH+r'\chromedriver.exe')
     for d0, (field, name) in data.d_fn.items():
         run(d0)
