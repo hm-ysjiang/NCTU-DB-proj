@@ -3,10 +3,11 @@
 -- log
 -- need to figure out what kind info may be useful
 -- 新增 pos_name, pos_field, cc, td，並且將儲存資訊從薪資上下限改成平均
+-- 把所有資訊都拿來統計了
 
-SET @name = NULL, @degree = NULL, @salary = NULL, @exp_year = NULL, @job_type = NULL,
-    @worktime_min = NULL, @worktime_max = NULL, @is_night = NULL, @needed_num = NULL, @cc = NULL, @td = NULL,
-    @pos_name = NULL, @pos_field = '管理'
+SET @name = NULL, @degree = NULL, @salary = NULL, @exp_year = NULL, @job_type = 0,
+    @worktime_min = NULL, @worktime_max = NULL, @is_night = NULL, @needed_num = NULL, @cc = '臺北市', @td = NULL,
+    @pos_name = NULL, @pos_field = NULL
 ;
 
 -- create temp table & insert
@@ -72,8 +73,9 @@ WHERE   job.job_id = jobinfo.job_id
 
 -- query info in need
 select count(*) from result;
-
 select degree, count(*) from result GROUP BY degree;
+select salary as HIGHEST_SALARY from result ORDER BY salary DESC LIMIT 1;
+select salary as LOWEST_SALARY from result ORDER BY salary ASC LIMIT 1;
 select floor((salary/10000)) as salary_intervals, count(*) from result GROUP BY salary_intervals; -- 薪資區間 以萬元為單位
 select exp_year, count(*) from result GROUP BY exp_year;
 select job_type, count(*) from result GROUP BY job_type;
