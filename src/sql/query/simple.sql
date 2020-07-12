@@ -2,35 +2,40 @@
 -- log
 -- 2020/7/10 : 幹不知道為啥出來是empty set
 -- 2020/7/10 : 輸入特定關鍵字(@name)和地區(@cc, @td)的功能可以run了。Output 除了 jobinfo 和 com_name 以外還需要有什麼?
+-- 2020/7/12 : 只需要回傳 job_id。已確認可以work
+SET
+        @name = '六角國際',
+        @cc = '新竹縣',
+        @td = '竹北市';
+
 SELECT
-        t.*,
-        p.pos_field,
-        p.pos_name,
-        l.area_cctd_name
+        jobinfo.job_id AS JOB_ID
 FROM
+        jobinfo,
+        company,
         (
                 SELECT
                         job.job_id,
-                        job.pos_id AS pos_id,
-                        job.area_id AS area_id,
-                        jobinfo.job_name,
-                        company.com_name,
-                        jobinfo.low_salary,
-                        jobinfo.high_salary
+                        job.com_id
                 FROM
-                        jobinfo,
-                        company,
-                        job
+                        job,
+                        localarea
                 WHERE
-                        jobinfo.job_id = job.job_id
-                        AND job.com_id = company.com_id
+                        job.area_id = localarea.area_id
                         AND (
-                                (jobinfo.job_name LIKE CONCAT("%", "nike", "%"))
-                                OR (company.com_name LIKE CONCAT("%", "nike", "%"))
-                        )
-        ) AS t,
-        position p,
-        localarea l
+                                (@cc IS NULL)
+                                OR (@cc = localarea.area_cc_name)
+                        ) -- 判斷是否是NULL要用 "is NULL"
+                        AND (
+                                (@td IS NULL)
+                                OR (@td = localarea.area_td_name)
+                        ) -- 不能用 "= NULL"
+        ) AS job
 WHERE
-        t.pos_id = p.pos_id
-        AND t.area_id = l.area_id;
+        jobinfo.job_id = job.job_id
+        AND job.com_id = company.com_id
+        AND (
+                (jobinfo.job_name LIKE CONCAT('%', @name, '%'))
+                OR (company.com_name LIKE CONCAT('%', @name, '%'))
+        ) -- 記得用CONCAT連結字串不要亂用operator
+;
