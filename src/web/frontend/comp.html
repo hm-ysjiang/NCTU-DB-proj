@@ -3,13 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Jobs</title>
+    <title>Find Jobs - ${com_name}</title>
     <link rel="stylesheet" href="/frontend/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="/frontend/content.css">
+    <style>
+        body {
+            background-color: #f4f4f4;
+        }
+
+        .continfo-block {
+            border-width: .8;
+            border-color: #97BDDF;
+            border-style: solid !important;
+            text-align: center;
+            padding-bottom: 2;
+        }
+
+        .continfo-block-title {
+            background-color: #97BDDF;
+            color: white;
+            padding-left: 10;
+            padding-right: 10;
+            padding-bottom: 2;
+            width: 100%;
+            font-size: 24;
+            font-weight: bold;
+        }
+
+        label {
+            padding-top: 16;
+        }
+    </style>
 </head>
 
 <body>
-    <p>${cid}</p>
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark" style="background-color: #E59C61;">
+        <a class="navbar-brand" href="/">Find Jobs</a>
+
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item" style="font-weight: bolder;">
+                    <a class="nav-link" style="cursor: pointer;" href="/basic">簡易</a>
+                </li>
+                <li class="nav-item" style="font-weight: bolder;">
+                    <a class="nav-link" style="cursor: pointer;" href="/advance">進階</a>
+                </li>
+                <li class="nav-item" style="font-weight: bolder;">
+                    <a class="nav-link" style="cursor: pointer;" href="/statistic">統計</a>
+                </li>
+                <li class="nav-item active" style="font-weight: bolder;">
+                    <a class="nav-link">公司</a>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0" action="/logout" method="POST">
+                <button class="btn my-2 my-sm-0 btn-logout" type="submit">登出</button>
+            </form>
+        </div>
+    </nav>
+
+    <div style="margin: 0 auto; width: 70%; margin-bottom: 64; padding: 20 32; background-color: white;">
+        <div style="width: 100%;">
+            <h3><strong>${com_name}</strong></h3>
+            <div style="padding: 0 16;">
+                <h5><strong><label for="com_addr">地址</label></strong></h5>
+                <div id="com_addr" style="padding: 0 12;">
+                    ${com_addr}
+                </div>
+                <div style="display: ${com_emp-show};">
+                    <h5><strong><label for="com_emp">員工人數</label></strong></h5>
+                    <div id="com_emp" style="padding: 0 12;">
+                        ${com_emp} 人
+                    </div>
+                </div>
+                <h5><strong><label for="suggest-area">連絡電話</label></strong></h5>
+                <img src="https://www.1111.com.tw/graphHandle/txtimg.aspx?tb=1&cl=1&no=${com_id}"
+                    style="padding: 0 12;">
+            </div>
+            <div style="display: ${com_job-show};">
+                <hr>
+                <h4><strong>該公司職缺</strong></h4>
+                <div style="padding: 0 16;">
+                    ${com_job}
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
