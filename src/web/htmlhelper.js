@@ -294,6 +294,28 @@ module.exports = {
     },
     castSalaryString: function (lo, hi) {
         return (lo == hi ? lo : '' + (lo ? lo : '') + ' ~ ' + (hi ? hi : ''))
+    },
+    simpleSearch: function (search, callback) {
+        db.query(this.renderString(this.query_strings.searchSimple, { 'search': search }), (err, res, fields) => {
+            if (err)
+                return callback(err)
+            fs.readFile(__dirname + '/frontend/component/job-block-suggest.html', (err, component) => {
+                if (err)
+                    return callback(err)
+                resComp = ''
+                for (row in res) {
+                    resComp += this.renderString(component, {
+                        'job_name': res[row].job_name,
+                        'pos_field': res[row].pos_field,
+                        'pos_name': res[row].pos_name,
+                        'salary': this.castSalaryString(res[row].low_salary, res[row].high_salary),
+                        'area_cctd': res[row].area_cctd_name,
+                        'job_id': res[row].job_id
+                    })
+                }
+                callback(null, resComp)
+            })
+        })
     }
     ,
     query_strings: {
@@ -310,7 +332,8 @@ module.exports = {
         suggestionPos: 'SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, t.area_cctd_name, p.pos_field, p.pos_name FROM (SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, l.area_cctd_name, t.pos_id FROM (SELECT t.job_id, j.job_name, j.low_salary, j.high_salary, t.area_id, t.pos_id FROM (SELECT * FROM job WHERE pos_id = ${pos_id} AND job_id != ${job_id}) AS t, jobinfo j WHERE j.job_id = t.job_id) AS t, localarea AS l WHERE t.area_id = l.area_id) AS t, position p WHERE t.pos_id = p.pos_id ORDER BY RAND() LIMIT 5;',
         suggestionArea: 'SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, t.area_cctd_name, p.pos_field, p.pos_name FROM (SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, l.area_cctd_name, t.pos_id FROM (SELECT t.job_id, j.job_name, j.low_salary, j.high_salary, t.area_id, t.pos_id FROM (SELECT * FROM job WHERE area_id = ${area_id} AND job_id != ${job_id}) AS t, jobinfo j WHERE j.job_id = t.job_id) AS t, localarea AS l WHERE t.area_id = l.area_id) AS t, position p WHERE t.pos_id = p.pos_id ORDER BY RAND() LIMIT 5;',
         compInfo: 'select * from company where com_id = ${com_id};',
-        compJobs: 'SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, t.area_cctd_name, p.pos_field, p.pos_name FROM (SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, l.area_cctd_name, t.pos_id FROM (SELECT t.job_id, j.job_name, j.low_salary, j.high_salary, t.area_id, t.pos_id FROM (SELECT * FROM job WHERE com_id = ${com_id}) AS t, jobinfo j WHERE j.job_id = t.job_id) AS t, localarea AS l WHERE t.area_id = l.area_id) AS t, position p WHERE t.pos_id = p.pos_id;'
+        compJobs: 'SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, t.area_cctd_name, p.pos_field, p.pos_name FROM (SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, l.area_cctd_name, t.pos_id FROM (SELECT t.job_id, j.job_name, j.low_salary, j.high_salary, t.area_id, t.pos_id FROM (SELECT * FROM job WHERE com_id = ${com_id}) AS t, jobinfo j WHERE j.job_id = t.job_id) AS t, localarea AS l WHERE t.area_id = l.area_id) AS t, position p WHERE t.pos_id = p.pos_id;',
+        searchSimple: 'SELECT t.*, p.pos_field, p.pos_name, l.area_cctd_name FROM (SELECT job.job_id, job.pos_id AS pos_id, job.area_id AS area_id, jobinfo.job_name, company.com_name, jobinfo.low_salary, jobinfo.high_salary FROM jobinfo, company, job WHERE jobinfo.job_id = job.job_id AND job.com_id = company.com_id AND ((jobinfo.job_name LIKE CONCAT("%", "${search}", "%")) OR (company.com_name LIKE CONCAT("%", "${search}", "%")))) AS t, position p, localarea l WHERE t.pos_id = p.pos_id AND t.area_id = l.area_id;'
     },
     degree_table: ['不拘', '國中', '高中職', '專科', '大學', '碩士', '博士']
 }

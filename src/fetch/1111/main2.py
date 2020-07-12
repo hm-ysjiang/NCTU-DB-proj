@@ -37,7 +37,7 @@ def job_detail(jid):
     if r.ok:
         people = r'\N'
         duration = 0
-        time = 0
+        _time = 0
 
         soup = Soup(r.text, 'html.parser')
         datalist = soup.find('ul', class_='dataList').find_all('li')
@@ -56,9 +56,11 @@ def job_detail(jid):
                 elif title == '工作時間：':
                     cont = li.find('div', class_='listContent').text
                     if cont.find('日班') != -1:
-                        time += 1
+                        _time += 1
                     if cont.find('晚班') != -1:
-                        time += 2
+                        _time += 2
+                    if not _time:
+                        continue
                     m = re.search(r'(\d+:\d+).*?(\d+:\d+)', cont)
                     if not m:
                         duration = 8
@@ -72,7 +74,7 @@ def job_detail(jid):
         except Exception as e:
             print(e)
             return {'ok': False, 'msg': 'Exception error'}
-        return {'ok': True, 'people': people, 'duration': duration, 'time': time}
+        return {'ok': True, 'people': people, 'duration': duration, 'time': _time}
     else:
         return {'ok': False, 'msg': 'Connection Failed'}
 

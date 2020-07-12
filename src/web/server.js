@@ -13,16 +13,20 @@ const wss = new websockServer({ server })
 
 // ws setup
 wss.on('connection', ws => {
-    // On connect
-    console.log('Client connected')
-
-    int = setInterval(() => {
-        ws.send(String(new Date()))
-    }, 1000)
-
-    ws.on('close', () => {
-        // On connection close
-        clearInterval(int)
+    ws.on('message', rawdata => {
+        data = JSON.parse(rawdata)
+        switch (data.from) {
+            case 'basic':
+                helper.simpleSearch(data.data, (err, resComponent) => {
+                    if (err) {
+                        ws.send(JSON.stringify({ identifier: data.identifier, ok: false }))
+                    }
+                    else {
+                        ws.send(JSON.stringify({ identifier: data.identifier, ok: true, result: resComponent }))
+                    }
+                })
+                break
+        }
     })
 })
 
