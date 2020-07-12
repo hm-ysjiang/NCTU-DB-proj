@@ -91,11 +91,12 @@ app.get('/comp/:cid', (req, res) => {
     if (!req.session.username)
         res.redirect('/login')
     else
-        helper.renderFile(__dirname + '/frontend/comp.html', {
-            cid: req.params.cid
-        }, (err, html) => {
+        helper.renderComPage(req.params.cid, (err, html) => {
             req.session.prevUrl = '/comp/' + req.params.cid
-            res.send(html)
+            if (err)
+                res.sendFile(__dirname + '/frontend/error.html')
+            else
+                res.send(html)
         })
 })
 

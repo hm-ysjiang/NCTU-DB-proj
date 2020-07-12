@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Jobs</title>
+    <title>Find Jobs - ${job_name}</title>
     <link rel="stylesheet" href="/frontend/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="/frontend/content.css">
     <style>
@@ -28,6 +28,10 @@
             width: 100%;
             font-size: 24;
             font-weight: bold;
+        }
+
+        label {
+            padding-top: 16;
         }
     </style>
 </head>
@@ -58,7 +62,7 @@
     </nav>
 
     <div style="margin: 0 auto; width: 70%; margin-bottom: 64; padding: 20 32; background-color: white;">
-        <div style="width: 100%; display: inline-flex;">
+        <div style="width: 100%;">
             <div class="job-block">
                 <div style="display: inline-flex; width: 100%">
                     <div class="continfo-block-title">
@@ -77,7 +81,7 @@
                 </div>
                 <div style="display: inline-flex; width: 100%">
                     <div class="continfo-block" style="width: 100%; min-width: fit-content;padding: 0 3;">
-                        ${salary_unit}薪 ${low_salary} ~ ${high_salary}元
+                        ${salary_unit}薪 ${salary}元
                     </div>
                     <div class="continfo-block" style="min-width: 60;">
                         ${job_type}
@@ -91,7 +95,7 @@
                 </div>
                 <div style="display: inline-flex; width: 100%">
                     <div class="continfo-block" style="width: 100%; min-width: fit-content;padding: 0 3;">
-                        ${pos_field} / ${pos_name}
+                        ${pos_field} ─ ${pos_name}
                     </div>
                     <div class="continfo-block" style="min-width: 125;">
                         ${area_cctd_name}
@@ -111,7 +115,25 @@
                     </div>
                 </div>
             </div>
+            <hr>
+            <h3><strong>你可能會感興趣...</strong></h3>
+            <div style="padding: 0 16;">
+                <h5><strong><label for="suggest-comp" style="display: ${suggest-comp-show};">同公司職缺</label></strong></h5>
+                <div id="suggest-comp">
+                    ${suggest-comp}
+                </div>
+                <h5><strong><label for="suggest-pos" style="display: ${suggest-pos-show};">${pos_field} ─ ${pos_name}
+                            職缺</label></strong></h5>
+                <div id="suggest-pos">
+                    ${suggest-pos}
+                </div>
+                <h5><strong><label for="suggest-area" style="display: ${suggest-area-show};">同地區職缺</label></strong></h5>
+                <div id="suggest-area">
+                    ${suggest-area}
+                </div>
+            </div>
         </div>
+    </div>
 
 </body>
 
