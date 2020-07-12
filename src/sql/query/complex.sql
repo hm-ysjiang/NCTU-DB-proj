@@ -4,6 +4,7 @@
 -- 2020/7/10 : 幹你娘這個出來也是empty set
 -- 2020/7/10 : 基於jobinfo 的查詢可以run了
 -- 2020/7/12 : 已確認可以work
+-- 2020/7/12 : 加上篩選職位類別
 
 -- instruction :
 -- @name : 職缺或公司名稱只要存在關鍵字即可
@@ -16,12 +17,13 @@
 -- @cc, @td : 須完全相符（我認為做選單最好）
 
 SET @name = '經理', @degree = 6, @salary = 30000, @exp_year = NULL, @job_type = 0,
-    @worktime_min = NULL, @worktime_max = NULL, @is_night = 1, @needed_num = 0, @cc = '臺北市', @td = NULL;
+    @worktime_min = NULL, @worktime_max = NULL, @is_night = 1, @needed_num = 0, @cc = '臺北市', @td = NULL,
+    @pos_name = NULL, @pos_field = '管理'
+;
 
 SELECT  jobinfo.job_id
-
-FROM    jobinfo, company, (
-                            SELECT  job.job_id, job.com_id
+FROM    jobinfo, position, company, (
+                            SELECT  job.job_id, job.com_id, job.pos_id
                             FROM    job, localarea
                             WHERE       job.area_id = localarea.area_id
                                     AND ((@cc is NULL) OR (@cc = localarea.area_cc_name))
@@ -36,12 +38,13 @@ WHERE   job.job_id = jobinfo.job_id
         AND ((@is_night is NULL)      OR (@is_night = jobinfo.is_night)                        )
         AND ((@needed_num is NULL)    OR (@needed_num <= jobinfo.needed_num)                   )
         AND ((@job_type is NULL)      OR (@job_type = jobinfo.job_type)                        )
-
         AND ((@salary is NULL)        OR
             ((@job_type = JOB_TYPE)                                                              -- 要馬沒有指定薪資，要馬要有設定type才能指定薪資
             AND ((HIGH_SALARY is NULL AND LOW_SALARY >= @salary) OR (HIGH_SALARY >= @salary))))  -- 沒有薪資上限（通常是面議）則最低薪資需大於預期薪資，否則只要最高薪資大於即可
-
         -- added after 2020/7/12
         AND ((@name is NULL)          OR (jobinfo.job_name LIKE CONCAT('%', @name, '%'))
                                       OR (company.com_name LIKE CONCAT('%', @name, '%'))       )
+        AND job.pos_id = position.pos_id
+        AND ((@pos_name is NULL)      OR (@pos_name = position.pos_name)                            )
+        AND ((@pos_field is NULL)     OR (@pos_field = position.pos_field)                          )
 ;
