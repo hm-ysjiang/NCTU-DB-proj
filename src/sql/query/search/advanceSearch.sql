@@ -1,11 +1,21 @@
+-- search job by job info
+
 SELECT
     j.job_id,
     jobinfo.job_name,
     jobinfo.low_salary,
     jobinfo.high_salary,
+    IF(
+        (jobinfo.high_salary is NULL),
+        jobinfo.low_salary,
+        ((jobinfo.low_salary + jobinfo.high_salary) / 2)
+    ) as _salary,
+    jobinfo.worktime,
+    jobinfo.exp_year,
     position.pos_field,
     position.pos_name,
-    localarea.area_cctd_name
+    j.area_cc_name,
+    j.area_cctd_name
 FROM
     jobinfo,
     position,
@@ -14,7 +24,9 @@ FROM
         SELECT
             job.job_id,
             job.com_id,
-            job.pos_id
+            job.pos_id,
+            localarea.area_cc_name,
+            localarea.area_cctd_name
         FROM
             job,
             localarea
@@ -61,7 +73,8 @@ WHERE
         )
     )
     AND (
-        (
+        ("${search}" = "")
+        OR (
             jobinfo.job_name LIKE CONCAT("%", "${search}", "%")
         )
         OR (
