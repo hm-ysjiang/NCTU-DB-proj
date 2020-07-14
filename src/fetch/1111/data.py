@@ -1066,7 +1066,29 @@ d_fn = {
 }
 
 if __name__ == '__main__':
-    with open('position.csv', 'w', encoding='utf-8') as file:
-        file.write('pos_id,pos_field,pos_name\n')
-        for i, fn in d_fn.items():
-            file.write(f'{i},{fn[0]},{fn[1]}\n')
+    _option_field = r'<option for="{0}">{1}</option>'
+    _option_name = r'<select class="form-control area-td" style="display: none;" id="{0}"><option>不拘</option>{1}</select>'
+    _option_name_inner = r'<option>{0}</option>'
+    with open('option.html', 'w', encoding='utf-8') as file:
+        js = {}
+        record = set()
+        for k, v in localarea.items():
+            cc, td = k[:3], k[3:]
+            if v not in record:
+                record.add(v)
+                if cc not in js.keys():
+                    js[cc] = []
+                js[cc].append(td)
+        fields = ''
+        names = ''
+        for i, k in enumerate(js.keys()):
+            fields += _option_field.format(f'area-td-{i}', k) + '\n'
+            innertmp = ''
+            for v in js[k]:
+                innertmp += _option_name_inner.format(v) + '\n'
+            names += _option_name.format(f'area-td-{i}', innertmp) + '\n'
+        file.write(fields)
+        file.write('\n')
+        file.write('\n')
+        file.write(names)
+        file.write('\n')
