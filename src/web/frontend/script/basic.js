@@ -12,10 +12,14 @@ ws.onmessage = evt => {
         loader = document.getElementById('loader')
         resBlock = document.getElementById('search-res')
         resContainer = document.getElementById('search-res-container')
+        dataCount = document.getElementById('data-count')
+        timeElapsed = document.getElementById('time-elapsed')
         if (loader.getAttribute('identifier') == data.identifier) {
             loader.style['display'] = 'none'
             resBlock.style['display'] = 'block'
             resContainer.innerHTML = data.result
+            dataCount.textContent = data.count
+            timeElapsed.textContent = parseInt(new Date().getTime() - data.time) / 1000
         }
     }
     else {
@@ -35,10 +39,9 @@ window.onload = () => {
             loader.setAttribute('identifier', iden)
             loader.style['display'] = 'block'
             resBlock.style['display'] = 'none'
-            for (todel = resContainer.children.length - 1; todel >= 0; todel--)
-                resContainer.removeChild(resContainer.children[todel])
+            resContainer.innerHTML = ''
 
-            ws.send(JSON.stringify({ from: 'basic', data: search, identifier: iden }))
+            ws.send(JSON.stringify({ from: 'basic', data: search, identifier: iden, time: new Date().getTime() }))
         }
     })
     document.getElementById('search-input').addEventListener('keyup', evt => {
@@ -53,10 +56,9 @@ window.onload = () => {
                 loader.setAttribute('identifier', iden)
                 loader.style['display'] = 'block'
                 resBlock.style['display'] = 'none'
-                for (todel = resContainer.children.length - 1; todel >= 0; todel--)
-                    resContainer.removeChild(resContainer.children[todel])
+                resContainer.innerHTML = ''
 
-                ws.send(JSON.stringify({ from: 'basic', data: search, identifier: iden }))
+                ws.send(JSON.stringify({ from: 'basic', data: search, identifier: iden, time: new Date().getTime() }))
             }
         }
     })

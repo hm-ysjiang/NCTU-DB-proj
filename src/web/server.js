@@ -17,13 +17,26 @@ wss.on('connection', ws => {
         data = JSON.parse(rawdata)
         switch (data.from) {
             case 'basic':
-                helper.simpleSearch(data.data, (err, resComponent) => {
+                helper.simpleSearch(data.data, (err, resComponent, count) => {
                     if (err) {
                         ws.send(JSON.stringify({ identifier: data.identifier, ok: false }))
                     }
                     else {
-                        ws.send(JSON.stringify({ identifier: data.identifier, ok: true, result: resComponent }))
+                        ws.send(JSON.stringify({ identifier: data.identifier, ok: true, result: resComponent, time: data.time, count: count }))
                     }
+                })
+                break
+            case 'advance':
+                helper.advanceSearch(data.data, (err, resComponent, count) => {
+                    if (err) {
+                        console.log(err)
+                        ws.send(JSON.stringify({ identifier: data.identifier, ok: false }))
+                    }
+                    else {
+                        ws.send(JSON.stringify({ identifier: data.identifier, ok: true, content: 'mainresult', result: resComponent, time: data.time, count: count }))
+                    }
+                }, (content, result) => {
+                    ws.send(JSON.stringify({ identifier: data.identifier, ok: true, content: content, result: result }))
                 })
                 break
         }
@@ -66,15 +79,6 @@ app.get('/advance', (req, res) => {
     else {
         req.session.prevUrl = '/advance'
         res.sendFile(__dirname + '/frontend/advance.html')
-    }
-})
-
-app.get('/statistic', (req, res) => {
-    if (!req.session.username)
-        res.redirect('/login')
-    else {
-        req.session.prevUrl = '/statistic'
-        res.sendFile(__dirname + '/frontend/statistic.html')
     }
 })
 

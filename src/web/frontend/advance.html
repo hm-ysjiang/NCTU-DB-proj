@@ -3,10 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Jobs</title>
-    <script src="./frontend/script/advance.js"></script>
+    <title>Find Jobs - 進階搜尋</title>
+    <script src="/frontend/script/advance.js"></script>
+    <script src="/frontend/jquery/jquery-3.4.1.min.js"></script>
+    <script src="/frontend/bootstrap/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="/frontend/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="/frontend/content.css">
+    <style>
+        hr {
+            margin: 5 auto;
+        }
+
+        #loader {
+            border: 16px solid #f3f3f3;
+            /* Light grey */
+            border-top: 16px solid #3498db;
+            /* Blue */
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -21,9 +49,6 @@
                 <li class="nav-item active" style="font-weight: bolder;">
                     <a class="nav-link">進階</a>
                 </li>
-                <li class="nav-item" style="font-weight: bolder;">
-                    <a class="nav-link" style="cursor: pointer;" href="/statistic">統計</a>
-                </li>
             </ul>
             <form class="form-inline my-2 my-lg-0" action="/logout" method="POST">
                 <button class="btn my-2 my-sm-0 btn-logout" type="submit">登出</button>
@@ -31,14 +56,1395 @@
         </div>
     </nav>
 
+    <div style="margin: 0 auto; width: 70%; margin-bottom: 64; padding: 20 32; background-color: white;">
+        <div style="width: 100%;">
+            <h3 style="margin-bottom: 16;"><strong>進階搜尋</strong></h3>
+            <div style="width: 100%; padding: 0 16;">
+                <div style="display: inline-flex; width: 100%; margin-bottom: 5;">
+                    <input id="search-input" class="form-control form-control-lg" type="text" placeholder="搜尋職缺名稱"
+                        style="width: 100%;">
+                    <button id="search-btn" class="btn btn-lg btn-success" style="min-width: 80;">搜尋</button>
+                </div>
+                <div style="display: inline-flex; width: 100%; margin-bottom: 5;">
+                    <div style="display: inline-flex; width: 20%;">
+                        <div style="min-width: 70; height: 21; margin: auto 0; padding-bottom: 6;"><span>您的學歷</span>
+                        </div>
+                        <select id="degree" class="form-control" style="min-width: 80;">
+                            <option value="1">國中</option>
+                            <option value="2">高中職</option>
+                            <option value="3">專科</option>
+                            <option value="4">大學</option>
+                            <option value="5">碩士</option>
+                            <option value="6">博士</option>
+                        </select>
+                    </div>
+                    <div style="display: inline-flex; width: 40%; padding: 0 1%;">
+                        <div style="min-width: 70; height: 21; margin: auto 0; padding-bottom: 6;"><span>您的年資</span>
+                        </div>
+                        <div class="input-group">
+                            <input id="exp-year" type="text" class="form-control" value="0">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">年</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: inline-flex; width: 50%;">
+                        <div style="min-width: 70; height: 21; margin: auto 0; padding-bottom: 6;"><span>工作時間</span>
+                        </div>
+                        <div class="input-group">
+                            <select id="night" class="form-control">
+                                <option value="1">日班</option>
+                                <option value="2">夜班</option>
+                                <option value="3">日/夜班</option>
+                            </select>
+                            <input id="worktime" type=" text" class="form-control">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">小時</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: inline-flex; width: 100%; margin-bottom: 5;">
+                    <div style="width: 49.5%; display: inline-flex; margin-right: .5%;">
+                        <div style="min-width: 70; height: 21; margin: auto 0; padding-bottom: 6;"><span>職位類別</span>
+                        </div>
+                        <select class="form-control" id="pos-field">
+                            <option id="all">不拘</option>
+                            <option for="pos-name-0">管理</option>
+                            <option for="pos-name-1">人資</option>
+                            <option for="pos-name-2">行政</option>
+                            <option for="pos-name-3">金融保險</option>
+                            <option for="pos-name-4">財務會計</option>
+                            <option for="pos-name-5">稽核審計</option>
+                            <option for="pos-name-6">國貿</option>
+                            <option for="pos-name-7">業務</option>
+                            <option for="pos-name-8">客服</option>
+                            <option for="pos-name-9">門市</option>
+                            <option for="pos-name-10">行銷</option>
+                            <option for="pos-name-11">企劃</option>
+                            <option for="pos-name-12">專案管理</option>
+                            <option for="pos-name-13">電腦硬體</option>
+                            <option for="pos-name-14">軟體工程</option>
+                            <option for="pos-name-15">系統規劃</option>
+                            <option for="pos-name-16">網站管理</option>
+                            <option for="pos-name-17">電子通訊</option>
+                            <option for="pos-name-18">光電半導體</option>
+                            <option for="pos-name-19">機械工程</option>
+                            <option for="pos-name-20">生產製程</option>
+                            <option for="pos-name-21">模具相關</option>
+                            <option for="pos-name-22">工具機加工</option>
+                            <option for="pos-name-23">操作技術</option>
+                            <option for="pos-name-24">技術服務</option>
+                            <option for="pos-name-25">採購資材</option>
+                            <option for="pos-name-26">運輸物流</option>
+                            <option for="pos-name-27">品管品保</option>
+                            <option for="pos-name-28">營建規劃</option>
+                            <option for="pos-name-29">營造施作</option>
+                            <option for="pos-name-30">醫事人員</option>
+                            <option for="pos-name-31">醫事保健</option>
+                            <option for="pos-name-32">醫務護理</option>
+                            <option for="pos-name-33">醫藥生技</option>
+                            <option for="pos-name-34">化工實驗</option>
+                            <option for="pos-name-35">新聞媒體</option>
+                            <option for="pos-name-36">影視演藝</option>
+                            <option for="pos-name-37">幕後執行</option>
+                            <option for="pos-name-38">出版翻譯</option>
+                            <option for="pos-name-39">美編設計</option>
+                            <option for="pos-name-40">法務專利</option>
+                            <option for="pos-name-41">顧問諮詢</option>
+                            <option for="pos-name-42">自然科學</option>
+                            <option for="pos-name-43">生物理工</option>
+                            <option for="pos-name-44">人文社會</option>
+                            <option for="pos-name-45">研究協助</option>
+                            <option for="pos-name-46">教育師資</option>
+                            <option for="pos-name-47">幼兒教育</option>
+                            <option for="pos-name-48">樂活才藝</option>
+                            <option for="pos-name-49">補習進修</option>
+                            <option for="pos-name-50">美容美髮</option>
+                            <option for="pos-name-51">餐飲烘焙</option>
+                            <option for="pos-name-52">觀光旅遊</option>
+                            <option for="pos-name-53">生活服務</option>
+                            <option for="pos-name-54">農林漁牧</option>
+                            <option for="pos-name-55">軍警消防</option>
+                            <option for="pos-name-56">保全相關</option>
+                        </select>
+                    </div>
+                    <div id="pos-name-container" style="width: 49.5%; margin-left: .5%; display: none;">
+                        <div style="min-width: 70; height: 21; margin: auto 0; padding-bottom: 6;"><span>職位名稱</span>
+                        </div>
+                        <div style="width: 100%;">
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-0">
+                                <option>不拘</option>
+                                <option>經營管理主管</option>
+                                <option>特別助理</option>
+                                <option>高階祕書</option>
+                                <option>基層管理幹部</option>
+                                <option>儲備幹部</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-1">
+                                <option>不拘</option>
+                                <option>人力資源主管</option>
+                                <option>人力資源專員</option>
+                                <option>人力仲介</option>
+                                <option>教育訓練人員</option>
+                                <option>人事助理</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-2">
+                                <option>不拘</option>
+                                <option>行政主管</option>
+                                <option>行政人員</option>
+                                <option>祕書</option>
+                                <option>行政助理</option>
+                                <option>總務主管</option>
+                                <option>總務人員</option>
+                                <option>總機／接待／櫃檯人員</option>
+                                <option>檔案資料管理人員</option>
+                                <option>電腦操作／資料輸入</option>
+                                <option>工讀生</option>
+                                <option>文件管理師</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-3">
+                                <option>不拘</option>
+                                <option>金融專業主管</option>
+                                <option>金融研究人員</option>
+                                <option>不動產審核／估價師</option>
+                                <option>授權／授信／徵信人員</option>
+                                <option>金融營業人員</option>
+                                <option>銀行辦事人員</option>
+                                <option>投資理財人員</option>
+                                <option>帳款催收人員</option>
+                                <option>股務人員</option>
+                                <option>承銷人員</option>
+                                <option>券商後線人員</option>
+                                <option>統計精算人員</option>
+                                <option>理賠人員</option>
+                                <option>核保／保險內勤人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-4">
+                                <option>不拘</option>
+                                <option>財務／會計主管</option>
+                                <option>主辦會計</option>
+                                <option>財務分析人員</option>
+                                <option>成本會計人員</option>
+                                <option>財務人員</option>
+                                <option>會計／出納／記帳人員</option>
+                                <option>財務／會計助理</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-5">
+                                <option>不拘</option>
+                                <option>會計師</option>
+                                <option>稽核主管</option>
+                                <option>稽核人員</option>
+                                <option>查帳／審計人員</option>
+                                <option>稅務人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-6">
+                                <option>不拘</option>
+                                <option>國貿人員</option>
+                                <option>國貿助理</option>
+                                <option>保稅人員</option>
+                                <option>船務</option>
+                                <option>報關人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-7">
+                                <option>不拘</option>
+                                <option>國內業務主管</option>
+                                <option>國外業務主管</option>
+                                <option>國內業務人員</option>
+                                <option>國外業務人員</option>
+                                <option>專案業務主管</option>
+                                <option>業務工程師</option>
+                                <option>業務助理</option>
+                                <option>電話行銷主管</option>
+                                <option>電話行銷人員</option>
+                                <option>融資／信用業務人員</option>
+                                <option>醫藥業務代表</option>
+                                <option>不動產經紀人／營業員</option>
+                                <option>保險業務員／經紀人</option>
+                                <option>廣告AE</option>
+                                <option>汽車銷售人員</option>
+                                <option>信用卡類人員</option>
+                                <option>補習班招生人員</option>
+                                <option>傳直銷人員</option>
+                                <option>加盟／招商人員</option>
+                                <option>通路開發人員</option>
+                                <option>商品開發人員</option>
+                                <option>駐校代表</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-8">
+                                <option>不拘</option>
+                                <option>客服主管</option>
+                                <option>客服工程師</option>
+                                <option>客服人員</option>
+                                <option>電訪人員</option>
+                                <option>電話客服人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-9">
+                                <option>不拘</option>
+                                <option>店長／門市管理人員</option>
+                                <option>大型賣場管理人員</option>
+                                <option>門市／店員／專櫃人員</option>
+                                <option>售票／收銀人員</option>
+                                <option>駐點銷售人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-10">
+                                <option>不拘</option>
+                                <option>廣告／行銷企劃主管</option>
+                                <option>行銷企劃人員</option>
+                                <option>廣告文案企劃人員</option>
+                                <option>廣告採購人員</option>
+                                <option>行銷企劃助理</option>
+                                <option>社群經營人員</option>
+                                <option>數位行銷人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-11">
+                                <option>不拘</option>
+                                <option>公關企劃人員</option>
+                                <option>活動企劃人員</option>
+                                <option>婚禮企劃人員</option>
+                                <option>市場調查／分析人員</option>
+                                <option>策展人</option>
+                                <option>產品企劃主管</option>
+                                <option>遊戲企劃人員</option>
+                                <option>產品企劃人員</option>
+                                <option>網站企劃人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-12">
+                                <option>不拘</option>
+                                <option>專案管理主管</option>
+                                <option>ERP專案管理師</option>
+                                <option>軟體相關管理師</option>
+                                <option>產品管理師</option>
+                                <option>其他專案管理師</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-13">
+                                <option>不拘</option>
+                                <option>電腦硬體研發工程師</option>
+                                <option>電腦組裝／維修</option>
+                                <option>網路及電信線路架設人員</option>
+                                <option>硬體工程研發主管</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-14">
+                                <option>不拘</option>
+                                <option>軟體專案主管</option>
+                                <option>軟體工程師</option>
+                                <option>通訊軟體工程師</option>
+                                <option>韌體研發類主管</option>
+                                <option>韌體工程師</option>
+                                <option>軟／韌體測試人員</option>
+                                <option>演算法開發工程師</option>
+                                <option>BIOS工程師</option>
+                                <option>CIM工程師</option>
+                                <option>MES工程師</option>
+                                <option>網站技術主管</option>
+                                <option>電玩程式設計師</option>
+                                <option>網站程式設計師</option>
+                                <option>APP工程師</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-15">
+                                <option>不拘</option>
+                                <option>系統工程師</option>
+                                <option>系統分析師</option>
+                                <option>系統維護員／操作員</option>
+                                <option>資料庫管理人員</option>
+                                <option>助理工程師</option>
+                                <option>電子商務技術主管</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-16">
+                                <option>不拘</option>
+                                <option>MIS／網管主管</option>
+                                <option>MIS工程師</option>
+                                <option>網路管理工程師</option>
+                                <option>資訊安全分析師</option>
+                                <option>資訊助理人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-17">
+                                <option>不拘</option>
+                                <option>通訊工程研發主管</option>
+                                <option>電信／通訊系統工程師</option>
+                                <option>RF通訊工程師</option>
+                                <option>電子工程主管</option>
+                                <option>電子工程師</option>
+                                <option>電源工程師</option>
+                                <option>零組件工程師</option>
+                                <option>SMT工程師</option>
+                                <option>PCB-Layout佈局工程師</option>
+                                <option>電子／通訊工程助理</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-18">
+                                <option>不拘</option>
+                                <option>半導體工程研發主管</option>
+                                <option>半導體工程師</option>
+                                <option>半導體製程工程師</option>
+                                <option>半導體設備工程師</option>
+                                <option>IC設計工程師</option>
+                                <option>類比IC設計工程師</option>
+                                <option>數位IC設計工程師</option>
+                                <option>IC佈局工程師</option>
+                                <option>IC封裝／測試工程師</option>
+                                <option>光電工程研發主管</option>
+                                <option>光電工程師</option>
+                                <option>太陽能技術工程師</option>
+                                <option>光學工程師</option>
+                                <option>光電製程工程師</option>
+                                <option>光電設備工程師</option>
+                                <option>光電／半導體工程助理</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-19">
+                                <option>不拘</option>
+                                <option>機械工程主管</option>
+                                <option>汽車研發人員</option>
+                                <option>電機工程主管</option>
+                                <option>電機技師／工程師</option>
+                                <option>電機維修人員</option>
+                                <option>機電技師／工程師</option>
+                                <option>微機電工程師</option>
+                                <option>機構工程師</option>
+                                <option>機械工程師</option>
+                                <option>熱傳工程師</option>
+                                <option>聲學／噪音工程師</option>
+                                <option>其他特殊工程人員</option>
+                                <option>機械設計／繪圖人員</option>
+                                <option>工程助理</option>
+                                <option>電機設備裝配員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-20">
+                                <option>不拘</option>
+                                <option>工廠高階主管</option>
+                                <option>生管主管</option>
+                                <option>製程主管</option>
+                                <option>設備工程主管</option>
+                                <option>領班／管理幹部</option>
+                                <option>生產技術／製程工程師</option>
+                                <option>生產設備工程師</option>
+                                <option>生產線工程師</option>
+                                <option>工業工程師</option>
+                                <option>紡織工務</option>
+                                <option>廠務／助理</option>
+                                <option>生管／助理</option>
+                                <option>包裝員／作業員</option>
+                                <option>PLC／自動控制工程師</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-21">
+                                <option>不拘</option>
+                                <option>CAD／CAM工程師</option>
+                                <option>模具技術人員</option>
+                                <option>塑膠模具技術人員</option>
+                                <option>金屬模具技術人員</option>
+                                <option>沖壓模具技術人員</option>
+                                <option>壓鑄模具技術人員</option>
+                                <option>鑄造／鍛造模具技術人員</option>
+                                <option>粉末冶金模具技術人員</option>
+                                <option>塑膠射出技術人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-22">
+                                <option>不拘</option>
+                                <option>CNC程式設計師</option>
+                                <option>CNC車床人員</option>
+                                <option>CNC銑床人員</option>
+                                <option>雷射技術操作員</option>
+                                <option>拋光／研磨技術人員</option>
+                                <option>沖床人員</option>
+                                <option>傳統車床人員</option>
+                                <option>傳統銑床人員</option>
+                                <option>線切割技術人員</option>
+                                <option>放電加工技術人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-23">
+                                <option>不拘</option>
+                                <option>環保／環境工程師／技師</option>
+                                <option>電鍍相關技術人員</option>
+                                <option>機械加工技術人員</option>
+                                <option>組裝組立技術人員</option>
+                                <option>印前製作人員</option>
+                                <option>印刷技術人員</option>
+                                <option>鈑金技術人員</option>
+                                <option>焊接技術人員</option>
+                                <option>塗裝技術人員</option>
+                                <option>鉗工</option>
+                                <option>技術人員</option>
+                                <option>堆高機操作人員</option>
+                                <option>機械操作人員</option>
+                                <option>製鞋類人員</option>
+                                <option>車縫人員</option>
+                                <option>學徒</option>
+                                <option>PCB技術人員</option>
+                                <option>噴漆技術人員</option>
+                                <option>染印人員</option>
+                                <option>鍋爐相關人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-24">
+                                <option>不拘</option>
+                                <option>維修技術主管</option>
+                                <option>技術支援主管</option>
+                                <option>通信維修人員</option>
+                                <option>產品設備維修人員</option>
+                                <option>電器產品維修人員</option>
+                                <option>電子設備維修人員</option>
+                                <option>精密儀器製造維修人員</option>
+                                <option>飛機修護員</option>
+                                <option>汽車維修人員</option>
+                                <option>汽車引擎技術人員</option>
+                                <option>其他車輛維修人員</option>
+                                <option>機車維修人員</option>
+                                <option>機械設備組裝測試人員</option>
+                                <option>冷凍空調技術人員／安裝員</option>
+                                <option>FAE工程師</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-25">
+                                <option>不拘</option>
+                                <option>採購主管</option>
+                                <option>資材主管</option>
+                                <option>採購人員</option>
+                                <option>資材人員</option>
+                                <option>倉管／物料管理員</option>
+                                <option>採購助理</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-26">
+                                <option>不拘</option>
+                                <option>運輸物流類主管</option>
+                                <option>飛行機師</option>
+                                <option>飛安人員</option>
+                                <option>船上作業人員</option>
+                                <option>倉儲物流人員</option>
+                                <option>運輸調度管理人員</option>
+                                <option>大客車司機</option>
+                                <option>小客車／小貨車司機</option>
+                                <option>空服人員</option>
+                                <option>地勤人員</option>
+                                <option>外務／快遞／送貨</option>
+                                <option>聯結車司機</option>
+                                <option>艙面部船員</option>
+                                <option>輪機部船員</option>
+                                <option>事務部船員</option>
+                                <option>大貨車司機</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-27">
+                                <option>不拘</option>
+                                <option>品管／品保主管</option>
+                                <option>職業安全衛生管理人員</option>
+                                <option>工廠安全衛生人員</option>
+                                <option>食品衛生管理師</option>
+                                <option>EMC／安規工程人員</option>
+                                <option>可靠度工程師</option>
+                                <option>品保工程師</option>
+                                <option>測試工程師</option>
+                                <option>故障分析工程師</option>
+                                <option>品管人員</option>
+                                <option>ISO品保人員</option>
+                                <option>食品檢驗人員</option>
+                                <option>檢驗人員</option>
+                                <option>公共衛生人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-28">
+                                <option>不拘</option>
+                                <option>建築師</option>
+                                <option>營建主管</option>
+                                <option>建築繪圖／設計</option>
+                                <option>土地開發人員</option>
+                                <option>估算人員</option>
+                                <option>發包人員</option>
+                                <option>內業工程人員</option>
+                                <option>水土保持技師</option>
+                                <option>土木技師／工程師</option>
+                                <option>結構技師／工程師</option>
+                                <option>都市／交通規劃人員</option>
+                                <option>水利工程師</option>
+                                <option>水電工程師</option>
+                                <option>電信／配線繪圖</option>
+                                <option>冷凍空調繪圖／設計</option>
+                                <option>水電及其他工程繪圖人員</option>
+                                <option>室內設計師</option>
+                                <option>景觀設計人員</option>
+                                <option>櫥窗／會場設計人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-29">
+                                <option>不拘</option>
+                                <option>工地主管</option>
+                                <option>工地品管員／工程師</option>
+                                <option>工地安全衛生工程師</option>
+                                <option>現場規劃工程師</option>
+                                <option>工務助理</option>
+                                <option>工務工管人員</option>
+                                <option>工地監工</option>
+                                <option>營建工程人員</option>
+                                <option>測量／儀校人員</option>
+                                <option>模板工程人員</option>
+                                <option>泥水工相關人員</option>
+                                <option>挖土／推土機相關操作人員</option>
+                                <option>吊車／起重機相關操作人員</option>
+                                <option>重機械操作人員</option>
+                                <option>營建雜工／粗工</option>
+                                <option>水電工</option>
+                                <option>金屬建材架構人員</option>
+                                <option>防水施工人員</option>
+                                <option>裝潢工程人員</option>
+                                <option>木工</option>
+                                <option>油漆工</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-30">
+                                <option>不拘</option>
+                                <option>醫師</option>
+                                <option>牙醫師</option>
+                                <option>中醫師</option>
+                                <option>醫學美容／整型</option>
+                                <option>麻醉醫師</option>
+                                <option>臨床／諮商心理師</option>
+                                <option>職能治療師</option>
+                                <option>物理治療師</option>
+                                <option>語言治療師</option>
+                                <option>呼吸治療師</option>
+                                <option>獸醫／獸醫佐</option>
+                                <option>其他醫療從業人員</option>
+                                <option>藥師</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-31">
+                                <option>不拘</option>
+                                <option>營養師</option>
+                                <option>醫事檢驗師</option>
+                                <option>復健技術師</option>
+                                <option>醫事放射師</option>
+                                <option>驗光師</option>
+                                <option>牙體技術人員</option>
+                                <option>推拿／按摩師</option>
+                                <option>放射性設備使用技術員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-32">
+                                <option>不拘</option>
+                                <option>護理長</option>
+                                <option>護士／護理師</option>
+                                <option>專科護理師</option>
+                                <option>照顧服務員</option>
+                                <option>勞工健康服務護理人員／廠護</option>
+                                <option>藥師助理</option>
+                                <option>診所助理</option>
+                                <option>牙醫助理</option>
+                                <option>醫院行政管理人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-33">
+                                <option>不拘</option>
+                                <option>生技主管</option>
+                                <option>醫藥研發人員</option>
+                                <option>病理藥理研究人員</option>
+                                <option>生物科技研發人員</option>
+                                <option>醫療器材研發工程師</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-34">
+                                <option>不拘</option>
+                                <option>化學／化工工程師</option>
+                                <option>奈米研發工程師</option>
+                                <option>特用化學工程師</option>
+                                <option>紡織化學工程師</option>
+                                <option>材料研發人員</option>
+                                <option>食品研發人員</option>
+                                <option>實驗／化驗人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-35">
+                                <option>不拘</option>
+                                <option>新聞／傳播媒體主管</option>
+                                <option>媒體公關主管</option>
+                                <option>傳播媒體編輯企劃</option>
+                                <option>播報人員</option>
+                                <option>攝影記者</option>
+                                <option>文字記者</option>
+                                <option>媒體公關人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-36">
+                                <option>不拘</option>
+                                <option>演藝經紀／宣傳人員</option>
+                                <option>表演／主持／直播人員</option>
+                                <option>模特兒</option>
+                                <option>演員</option>
+                                <option>聲樂及演唱家</option>
+                                <option>樂器演奏／合成音樂</option>
+                                <option>舞蹈演藝人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-37">
+                                <option>不拘</option>
+                                <option>導演／導播</option>
+                                <option>編劇及詞曲創作</option>
+                                <option>藝術指導／藝術總監</option>
+                                <option>執行製作／助理</option>
+                                <option>攝影師</option>
+                                <option>微波工程師</option>
+                                <option>影片製作技術人員</option>
+                                <option>剪輯師</option>
+                                <option>配音人員</option>
+                                <option>字幕人員</option>
+                                <option>棚內技術工程人員</option>
+                                <option>舞台搭設工程人員</option>
+                                <option>燈光技術人員</option>
+                                <option>音響／音控技術人員</option>
+                                <option>攝影助理</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-38">
+                                <option>不拘</option>
+                                <option>編採主管</option>
+                                <option>發行企劃／出版人員</option>
+                                <option>教材編輯人員</option>
+                                <option>編輯／文字類人員</option>
+                                <option>技術文件／說明書編譯</option>
+                                <option>校對人員</option>
+                                <option>英文翻譯／口譯人員</option>
+                                <option>日文翻譯／口譯人員</option>
+                                <option>其他語言翻譯／口譯人員</option>
+                                <option>排版人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-39">
+                                <option>不拘</option>
+                                <option>設計主管</option>
+                                <option>工業設計</option>
+                                <option>服裝設計</option>
+                                <option>鞋類／皮件設計</option>
+                                <option>多媒體動畫設計師</option>
+                                <option>網頁設計</option>
+                                <option>廣告設計</option>
+                                <option>商業設計</option>
+                                <option>包裝設計</option>
+                                <option>平面設計</option>
+                                <option>美編人員</option>
+                                <option>樣品師</option>
+                                <option>打版人員</option>
+                                <option>設計助理</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-40">
+                                <option>不拘</option>
+                                <option>律師</option>
+                                <option>法務主管</option>
+                                <option>法務人員</option>
+                                <option>代書／地政士</option>
+                                <option>實習律師</option>
+                                <option>法務助理</option>
+                                <option>商標／專利人員</option>
+                                <option>工商登記服務類人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-41">
+                                <option>不拘</option>
+                                <option>企管顧問</option>
+                                <option>專業顧問</option>
+                                <option>留學諮詢顧問</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-42">
+                                <option>不拘</option>
+                                <option>氣象相關研究人員</option>
+                                <option>地質與地球科學研究人員</option>
+                                <option>天文相關研究人員</option>
+                                <option>應用科學研究人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-43">
+                                <option>不拘</option>
+                                <option>數學研究人員</option>
+                                <option>統計學研究人員</option>
+                                <option>生物學專業與研究人員</option>
+                                <option>物理相關研究人員</option>
+                                <option>化學相關研究人員</option>
+                                <option>心理學研究人員</option>
+                                <option>臨床／實驗室研究人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-44">
+                                <option>不拘</option>
+                                <option>人類學研究人員</option>
+                                <option>哲學研究人員</option>
+                                <option>社會學研究人員</option>
+                                <option>歷史研究人員</option>
+                                <option>政治相關研究人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-45">
+                                <option>不拘</option>
+                                <option>其他研究人員</option>
+                                <option>助理研究人員</option>
+                                <option>研究助理</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-46">
+                                <option>不拘</option>
+                                <option>教授／副教授／助理教授</option>
+                                <option>講師</option>
+                                <option>助教</option>
+                                <option>國小教師</option>
+                                <option>國中教師</option>
+                                <option>高中職教師</option>
+                                <option>特殊教育教師</option>
+                                <option>學校行政人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-47">
+                                <option>不拘</option>
+                                <option>園長</option>
+                                <option>教保員／保育員</option>
+                                <option>幼教老師</option>
+                                <option>保母／托育人員</option>
+                                <option>托育中心主任／主管</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-48">
+                                <option>不拘</option>
+                                <option>音樂老師</option>
+                                <option>美術老師</option>
+                                <option>作文老師</option>
+                                <option>珠心算老師</option>
+                                <option>才藝類老師</option>
+                                <option>烹飪老師</option>
+                                <option>駕訓老師</option>
+                                <option>舞蹈健身老師</option>
+                                <option>游泳教練</option>
+                                <option>運動教練</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-49">
+                                <option>不拘</option>
+                                <option>電腦補習班老師</option>
+                                <option>語文補習班老師</option>
+                                <option>數理補習班老師</option>
+                                <option>升學補習班老師</option>
+                                <option>其他教育類老師</option>
+                                <option>補習班導師</option>
+                                <option>補習班主任／主管</option>
+                                <option>安親課輔老師</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-50">
+                                <option>不拘</option>
+                                <option>美容師</option>
+                                <option>美療師／芳療師</option>
+                                <option>美容講師／技導</option>
+                                <option>整體造型師</option>
+                                <option>髮型設計師</option>
+                                <option>美甲彩繪師</option>
+                                <option>寵物美容專業人員</option>
+                                <option>美容助理</option>
+                                <option>美髮助理</option>
+                                <option>美髮講師／技導</option>
+                                <option>美睫師</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-51">
+                                <option>不拘</option>
+                                <option>餐飲主管</option>
+                                <option>餐飲領班</option>
+                                <option>中式廚師</option>
+                                <option>西式廚師</option>
+                                <option>日式廚師</option>
+                                <option>鐵板燒廚師</option>
+                                <option>中／港式點心廚師</option>
+                                <option>其他料理廚師</option>
+                                <option>西點蛋糕師</option>
+                                <option>麵包師</option>
+                                <option>調酒師／吧台人員</option>
+                                <option>冷熱飲調製人員</option>
+                                <option>餐飲服務人員</option>
+                                <option>餐廚助手</option>
+                                <option>生鮮處理人員</option>
+                                <option>洗碗人員</option>
+                                <option>外送人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-52">
+                                <option>不拘</option>
+                                <option>飯店／旅館主管</option>
+                                <option>旅遊休閒類主管</option>
+                                <option>導遊／領隊／導覽</option>
+                                <option>票務人員／旅行社人員</option>
+                                <option>飯店／旅館櫃檯人員</option>
+                                <option>飯店／旅館服務人員</option>
+                                <option>休閒娛樂事業從業人員</option>
+                                <option>遊樂景點工作人員</option>
+                                <option>房務人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-53">
+                                <option>不拘</option>
+                                <option>禮儀師</option>
+                                <option>宗教／神職人員</option>
+                                <option>星象占卜人員</option>
+                                <option>家事服務／洗衣</option>
+                                <option>汽車美容</option>
+                                <option>搬運人員</option>
+                                <option>加油服務</option>
+                                <option>舉牌／傳單／派報員</option>
+                                <option>清潔／資源回收人員</option>
+                                <option>志工／義工類人員</option>
+                                <option>社會工作人員／督導</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-54">
+                                <option>不拘</option>
+                                <option>花藝／園藝人員</option>
+                                <option>農藝栽培專業人員</option>
+                                <option>農藝／畜產研究人員</option>
+                                <option>養殖／畜牧專業人員</option>
+                                <option>動物飼育專業人員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-55">
+                                <option>不拘</option>
+                                <option>志願役軍官／士官／士兵</option>
+                                <option>公家機關相關人員</option>
+                                <option>消防類相關人員</option>
+                                <option>救生員</option>
+                            </select>
+                            <select class="form-control pos-name" style="display: none;" id="pos-name-56">
+                                <option>不拘</option>
+                                <option>總幹事</option>
+                                <option>管理員</option>
+                                <option>隨扈／安全人員</option>
+                                <option>保全人員／警衛</option>
+                                <option>保全工程技術人員</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: inline-flex; width: 100%;">
+                    <div style="display: inline-flex; width: 49.5%; padding-right: .5%;">
+                        <div style="min-width: 70; height: 21; margin: auto 0; padding-bottom: 6;"><span>要求薪資</span>
+                        </div>
+                        <div class="input-group" style="width: 100%;">
+                            <select class="form-control" id="job-type" style="width: 40%;">
+                                <option value="0">月薪 (全職)</option>
+                                <option value="1">時薪 (工讀)</option>
+                            </select>
+                            <input id="salary" type="text" class="form-control" style="width: 60%;">
+                        </div>
+                    </div>
+                    <div style="display: inline-flex; width: 49.5%; padding-left: .5%;">
+                        <div style="min-width: 40; height: 21; margin: auto 0; padding-bottom: 6;"><span>地區</span>
+                        </div>
+                        <div style="width: 50%; display: inline-flex;">
+                            <select class="form-control" id="area-cc">
+                                <option id="all">不拘</option>
+                                <option for="area-td-0">基隆市</option>
+                                <option for="area-td-1">臺北市</option>
+                                <option for="area-td-2">新北市</option>
+                                <option for="area-td-3">桃園市</option>
+                                <option for="area-td-4">新竹市</option>
+                                <option for="area-td-5">新竹縣</option>
+                                <option for="area-td-6">宜蘭縣</option>
+                                <option for="area-td-7">苗栗縣</option>
+                                <option for="area-td-8">臺中市</option>
+                                <option for="area-td-9">彰化縣</option>
+                                <option for="area-td-10">南投縣</option>
+                                <option for="area-td-11">雲林縣</option>
+                                <option for="area-td-12">嘉義市</option>
+                                <option for="area-td-13">嘉義縣</option>
+                                <option for="area-td-14">臺南市</option>
+                                <option for="area-td-15">高雄市</option>
+                                <option for="area-td-16">屏東縣</option>
+                                <option for="area-td-17">澎湖縣</option>
+                                <option for="area-td-18">花蓮縣</option>
+                                <option for="area-td-19">臺東縣</option>
+                                <option for="area-td-20">金門縣</option>
+                                <option for="area-td-21">連江縣</option>
+                            </select>
+                        </div>
+                        <div id="area-container" style="width: 50%; display: inline-flex; display: none;">
+                            <div style="width: 100%;">
+                                <select class="form-control area-td" style="display: none;" id="area-td-0">
+                                    <option>不拘</option>
+                                    <option>仁愛區</option>
+                                    <option>中正區</option>
+                                    <option>信義區</option>
+                                    <option>中山區</option>
+                                    <option>安樂區</option>
+                                    <option>暖暖區</option>
+                                    <option>七堵區</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-1">
+                                    <option>不拘</option>
+                                    <option>中正區</option>
+                                    <option>大同區</option>
+                                    <option>中山區</option>
+                                    <option>松山區</option>
+                                    <option>大安區</option>
+                                    <option>萬華區</option>
+                                    <option>信義區</option>
+                                    <option>士林區</option>
+                                    <option>北投區</option>
+                                    <option>內湖區</option>
+                                    <option>南港區</option>
+                                    <option>文山區</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-2">
+                                    <option>不拘</option>
+                                    <option>板橋區</option>
+                                    <option>新莊區</option>
+                                    <option>中和區</option>
+                                    <option>永和區</option>
+                                    <option>土城區</option>
+                                    <option>樹林區</option>
+                                    <option>三峽區</option>
+                                    <option>鶯歌區</option>
+                                    <option>三重區</option>
+                                    <option>蘆洲區</option>
+                                    <option>五股區</option>
+                                    <option>泰山區</option>
+                                    <option>林口區</option>
+                                    <option>八里區</option>
+                                    <option>淡水區</option>
+                                    <option>三芝區</option>
+                                    <option>石門區</option>
+                                    <option>金山區</option>
+                                    <option>萬里區</option>
+                                    <option>汐止區</option>
+                                    <option>瑞芳區</option>
+                                    <option>貢寮區</option>
+                                    <option>平溪區</option>
+                                    <option>雙溪區</option>
+                                    <option>新店區</option>
+                                    <option>深坑區</option>
+                                    <option>石碇區</option>
+                                    <option>坪林區</option>
+                                    <option>烏來區</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-3">
+                                    <option>不拘</option>
+                                    <option>桃園區</option>
+                                    <option>中壢區</option>
+                                    <option>平鎮區</option>
+                                    <option>八德區</option>
+                                    <option>楊梅區</option>
+                                    <option>蘆竹區</option>
+                                    <option>大溪區</option>
+                                    <option>龍潭區</option>
+                                    <option>龜山區</option>
+                                    <option>大園區</option>
+                                    <option>觀音區</option>
+                                    <option>新屋區</option>
+                                    <option>復興區</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-4">
+                                    <option>不拘</option>
+                                    <option>東區</option>
+                                    <option>北區</option>
+                                    <option>香山區</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-5">
+                                    <option>不拘</option>
+                                    <option>竹北市</option>
+                                    <option>竹東鎮</option>
+                                    <option>新埔鎮</option>
+                                    <option>關西鎮</option>
+                                    <option>湖口鄉</option>
+                                    <option>新豐鄉</option>
+                                    <option>峨眉鄉</option>
+                                    <option>寶山鄉</option>
+                                    <option>北埔鄉</option>
+                                    <option>芎林鄉</option>
+                                    <option>橫山鄉</option>
+                                    <option>尖石鄉</option>
+                                    <option>五峰鄉</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-6">
+                                    <option>不拘</option>
+                                    <option>宜蘭市</option>
+                                    <option>頭城鎮</option>
+                                    <option>礁溪鄉</option>
+                                    <option>壯圍鄉</option>
+                                    <option>員山鄉</option>
+                                    <option>羅東鎮</option>
+                                    <option>蘇澳鎮</option>
+                                    <option>五結鄉</option>
+                                    <option>三星鄉</option>
+                                    <option>冬山鄉</option>
+                                    <option>大同鄉</option>
+                                    <option>南澳鄉</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-7">
+                                    <option>不拘</option>
+                                    <option>苗栗市</option>
+                                    <option>頭份市</option>
+                                    <option>竹南鎮</option>
+                                    <option>後龍鎮</option>
+                                    <option>通霄鎮</option>
+                                    <option>苑裡鎮</option>
+                                    <option>卓蘭鎮</option>
+                                    <option>造橋鄉</option>
+                                    <option>西湖鄉</option>
+                                    <option>頭屋鄉</option>
+                                    <option>公館鄉</option>
+                                    <option>銅鑼鄉</option>
+                                    <option>三義鄉</option>
+                                    <option>大湖鄉</option>
+                                    <option>獅潭鄉</option>
+                                    <option>三灣鄉</option>
+                                    <option>南庄鄉</option>
+                                    <option>泰安鄉</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-8">
+                                    <option>不拘</option>
+                                    <option>中區</option>
+                                    <option>東區</option>
+                                    <option>南區</option>
+                                    <option>西區</option>
+                                    <option>北區</option>
+                                    <option>北屯區</option>
+                                    <option>西屯區</option>
+                                    <option>南屯區</option>
+                                    <option>太平區</option>
+                                    <option>大里區</option>
+                                    <option>霧峰區</option>
+                                    <option>烏日區</option>
+                                    <option>豐原區</option>
+                                    <option>后里區</option>
+                                    <option>石岡區</option>
+                                    <option>東勢區</option>
+                                    <option>新社區</option>
+                                    <option>潭子區</option>
+                                    <option>大雅區</option>
+                                    <option>神岡區</option>
+                                    <option>大肚區</option>
+                                    <option>沙鹿區</option>
+                                    <option>龍井區</option>
+                                    <option>梧棲區</option>
+                                    <option>清水區</option>
+                                    <option>大甲區</option>
+                                    <option>外埔區</option>
+                                    <option>大安區</option>
+                                    <option>和平區</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-9">
+                                    <option>不拘</option>
+                                    <option>彰化市</option>
+                                    <option>員林市</option>
+                                    <option>和美鎮</option>
+                                    <option>鹿港鎮</option>
+                                    <option>溪湖鎮</option>
+                                    <option>二林鎮</option>
+                                    <option>田中鎮</option>
+                                    <option>北斗鎮</option>
+                                    <option>花壇鄉</option>
+                                    <option>芬園鄉</option>
+                                    <option>大村鄉</option>
+                                    <option>永靖鄉</option>
+                                    <option>伸港鄉</option>
+                                    <option>線西鄉</option>
+                                    <option>福興鄉</option>
+                                    <option>秀水鄉</option>
+                                    <option>埔心鄉</option>
+                                    <option>埔鹽鄉</option>
+                                    <option>大城鄉</option>
+                                    <option>芳苑鄉</option>
+                                    <option>竹塘鄉</option>
+                                    <option>社頭鄉</option>
+                                    <option>二水鄉</option>
+                                    <option>田尾鄉</option>
+                                    <option>埤頭鄉</option>
+                                    <option>溪州鄉</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-10">
+                                    <option>不拘</option>
+                                    <option>南投市</option>
+                                    <option>埔里鎮</option>
+                                    <option>草屯鎮</option>
+                                    <option>竹山鎮</option>
+                                    <option>集集鎮</option>
+                                    <option>名間鄉</option>
+                                    <option>鹿谷鄉</option>
+                                    <option>中寮鄉</option>
+                                    <option>魚池鄉</option>
+                                    <option>國姓鄉</option>
+                                    <option>水里鄉</option>
+                                    <option>信義鄉</option>
+                                    <option>仁愛鄉</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-11">
+                                    <option>不拘</option>
+                                    <option>斗六市</option>
+                                    <option>斗南鎮</option>
+                                    <option>林內鄉</option>
+                                    <option>古坑鄉</option>
+                                    <option>大埤鄉</option>
+                                    <option>莿桐鄉</option>
+                                    <option>虎尾鎮</option>
+                                    <option>西螺鎮</option>
+                                    <option>土庫鎮</option>
+                                    <option>褒忠鄉</option>
+                                    <option>二崙鄉</option>
+                                    <option>崙背鄉</option>
+                                    <option>麥寮鄉</option>
+                                    <option>臺西鄉</option>
+                                    <option>東勢鄉</option>
+                                    <option>北港鎮</option>
+                                    <option>元長鄉</option>
+                                    <option>四湖鄉</option>
+                                    <option>口湖鄉</option>
+                                    <option>水林鄉</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-12">
+                                    <option>不拘</option>
+                                    <option>東區</option>
+                                    <option>西區</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-13">
+                                    <option>不拘</option>
+                                    <option>太保市</option>
+                                    <option>朴子市</option>
+                                    <option>布袋鎮</option>
+                                    <option>大林鎮</option>
+                                    <option>民雄鄉</option>
+                                    <option>溪口鄉</option>
+                                    <option>新港鄉</option>
+                                    <option>六腳鄉</option>
+                                    <option>東石鄉</option>
+                                    <option>義竹鄉</option>
+                                    <option>鹿草鄉</option>
+                                    <option>水上鄉</option>
+                                    <option>中埔鄉</option>
+                                    <option>竹崎鄉</option>
+                                    <option>梅山鄉</option>
+                                    <option>番路鄉</option>
+                                    <option>大埔鄉</option>
+                                    <option>阿里山鄉</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-14">
+                                    <option>不拘</option>
+                                    <option>中西區</option>
+                                    <option>東區</option>
+                                    <option>南區</option>
+                                    <option>北區</option>
+                                    <option>安平區</option>
+                                    <option>安南區</option>
+                                    <option>永康區</option>
+                                    <option>歸仁區</option>
+                                    <option>新化區</option>
+                                    <option>左鎮區</option>
+                                    <option>玉井區</option>
+                                    <option>楠西區</option>
+                                    <option>南化區</option>
+                                    <option>仁德區</option>
+                                    <option>關廟區</option>
+                                    <option>龍崎區</option>
+                                    <option>官田區</option>
+                                    <option>麻豆區</option>
+                                    <option>佳里區</option>
+                                    <option>西港區</option>
+                                    <option>七股區</option>
+                                    <option>將軍區</option>
+                                    <option>學甲區</option>
+                                    <option>北門區</option>
+                                    <option>新營區</option>
+                                    <option>後壁區</option>
+                                    <option>白河區</option>
+                                    <option>東山區</option>
+                                    <option>六甲區</option>
+                                    <option>下營區</option>
+                                    <option>柳營區</option>
+                                    <option>鹽水區</option>
+                                    <option>善化區</option>
+                                    <option>大內區</option>
+                                    <option>山上區</option>
+                                    <option>新市區</option>
+                                    <option>安定區</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-15">
+                                    <option>不拘</option>
+                                    <option>楠梓區</option>
+                                    <option>左營區</option>
+                                    <option>鼓山區</option>
+                                    <option>三民區</option>
+                                    <option>鹽埕區</option>
+                                    <option>前金區</option>
+                                    <option>新興區</option>
+                                    <option>苓雅區</option>
+                                    <option>前鎮區</option>
+                                    <option>旗津區</option>
+                                    <option>小港區</option>
+                                    <option>鳳山區</option>
+                                    <option>大寮區</option>
+                                    <option>鳥松區</option>
+                                    <option>林園區</option>
+                                    <option>仁武區</option>
+                                    <option>大樹區</option>
+                                    <option>大社區</option>
+                                    <option>岡山區</option>
+                                    <option>路竹區</option>
+                                    <option>橋頭區</option>
+                                    <option>梓官區</option>
+                                    <option>彌陀區</option>
+                                    <option>永安區</option>
+                                    <option>燕巢區</option>
+                                    <option>田寮區</option>
+                                    <option>阿蓮區</option>
+                                    <option>茄萣區</option>
+                                    <option>湖內區</option>
+                                    <option>旗山區</option>
+                                    <option>美濃區</option>
+                                    <option>內門區</option>
+                                    <option>杉林區</option>
+                                    <option>甲仙區</option>
+                                    <option>六龜區</option>
+                                    <option>茂林區</option>
+                                    <option>桃源區</option>
+                                    <option>那瑪夏區</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-16">
+                                    <option>不拘</option>
+                                    <option>屏東市</option>
+                                    <option>潮州鎮</option>
+                                    <option>東港鎮</option>
+                                    <option>恆春鎮</option>
+                                    <option>萬丹鄉</option>
+                                    <option>崁頂鄉</option>
+                                    <option>新園鄉</option>
+                                    <option>林邊鄉</option>
+                                    <option>南州鄉</option>
+                                    <option>琉球鄉</option>
+                                    <option>枋寮鄉</option>
+                                    <option>枋山鄉</option>
+                                    <option>車城鄉</option>
+                                    <option>滿州鄉</option>
+                                    <option>高樹鄉</option>
+                                    <option>九如鄉</option>
+                                    <option>鹽埔鄉</option>
+                                    <option>里港鄉</option>
+                                    <option>內埔鄉</option>
+                                    <option>竹田鄉</option>
+                                    <option>長治鄉</option>
+                                    <option>麟洛鄉</option>
+                                    <option>萬巒鄉</option>
+                                    <option>新埤鄉</option>
+                                    <option>佳冬鄉</option>
+                                    <option>霧臺鄉</option>
+                                    <option>泰武鄉</option>
+                                    <option>瑪家鄉</option>
+                                    <option>來義鄉</option>
+                                    <option>春日鄉</option>
+                                    <option>獅子鄉</option>
+                                    <option>牡丹鄉</option>
+                                    <option>三地門鄉</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-17">
+                                    <option>不拘</option>
+                                    <option>馬公市</option>
+                                    <option>湖西鄉</option>
+                                    <option>白沙鄉</option>
+                                    <option>西嶼鄉</option>
+                                    <option>望安鄉</option>
+                                    <option>七美鄉</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-18">
+                                    <option>不拘</option>
+                                    <option>花蓮市</option>
+                                    <option>吉安鄉</option>
+                                    <option>壽豐鄉</option>
+                                    <option>新城鄉</option>
+                                    <option>鳳林鎮</option>
+                                    <option>光復鄉</option>
+                                    <option>玉里鎮</option>
+                                    <option>豐濱鄉</option>
+                                    <option>瑞穗鄉</option>
+                                    <option>富里鄉</option>
+                                    <option>秀林鄉</option>
+                                    <option>萬榮鄉</option>
+                                    <option>卓溪鄉</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-19">
+                                    <option>不拘</option>
+                                    <option>臺東市</option>
+                                    <option>成功鎮</option>
+                                    <option>關山鎮</option>
+                                    <option>長濱鄉</option>
+                                    <option>池上鄉</option>
+                                    <option>東河鄉</option>
+                                    <option>鹿野鄉</option>
+                                    <option>卑南鄉</option>
+                                    <option>大武鄉</option>
+                                    <option>綠島鄉</option>
+                                    <option>太麻里鄉</option>
+                                    <option>海端鄉</option>
+                                    <option>延平鄉</option>
+                                    <option>金峰鄉</option>
+                                    <option>達仁鄉</option>
+                                    <option>蘭嶼鄉</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-20">
+                                    <option>不拘</option>
+                                    <option>金城鎮</option>
+                                    <option>金湖鎮</option>
+                                    <option>金沙鎮</option>
+                                    <option>金寧鄉</option>
+                                    <option>烈嶼鄉</option>
+                                    <option>烏坵鄉</option>
+                                </select>
+                                <select class="form-control area-td" style="display: none;" id="area-td-21">
+                                    <option>不拘</option>
+                                    <option>南竿鄉</option>
+                                    <option>北竿鄉</option>
+                                    <option>莒光鄉</option>
+                                    <option>東引鄉</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <nav class="navbar fixed-bottom navbar-light bg-light" style="padding-top: 0; padding-bottom: 0;">
-        <ul class=" navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link" id="content"></a>
-            </li>
-        </ul>
-    </nav>
+        <div id="loader" style="margin: 32 auto; display: none;" identifier=""></div>
+        <div id="search-res" style="margin: 32 0; display: none;">
+            <hr>
+            <div style="display: inline-flex; width: 100%; justify-content: space-between;">
+                <button type="button" class="btn btn-info" data-toggle="modal"
+                    data-target="#statistic-modal-container">檢視統計資料</button>
+                <div style="text-align: right;">共<span id="data-count"></span>筆資料，耗時<span id="time-elapsed"></span>秒
+                </div>
+            </div>
+            <div id="search-res-container"></div>
+        </div>
+
+        <div class="modal fade" id="statistic-modal-container" tabindex="-1" role="dialog" aria-labelledby="statistics"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="statisticsTitle"><strong>進階搜尋 ─ 統計資料</strong></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <span style="font-size: large;"><strong>平均薪資</strong></span>
+                        <hr>
+                        <div style="margin: 0 auto; width: fit-content; margin-bottom: 20;">
+                            <span class="statistic-loading" id="salary-avg-running"><span>統計中...</span></span>
+                            <span class="statistic" id="salary-avg"><span id="salary-avg-text"></span>元</span>
+                        </div>
+
+                        <span style="font-size: large;"><strong>最高薪資</strong></span>
+                        <hr>
+                        <div style="margin: 0 auto; width: fit-content; margin-bottom: 20;">
+                            <span class="statistic-loading" id="salary-max-running"><span>統計中...</span></span>
+                            <span class="statistic" id="salary-max"><span id="salary-max-text"></span>元</span>
+                        </div>
+
+                        <span style="font-size: large;"><strong>最低薪資</strong></span>
+                        <hr>
+                        <div style="margin: 0 auto; width: fit-content; margin-bottom: 20;">
+                            <span class="statistic-loading" id="salary-min-running"><span>統計中...</span></span>
+                            <span class="statistic" id="salary-min"><span id="salary-min-text"></span>元</span>
+                        </div>
+
+                        <span style="font-size: large;"><strong>平均所需年資</strong></span>
+                        <hr>
+                        <div style="margin: 0 auto; width: fit-content; margin-bottom: 20;">
+                            <span class="statistic-loading" id="exp-avg-running"><span>統計中...</span></span>
+                            <span class="statistic" id="exp-avg"><span id="exp-avg-text"></span>年</span>
+                        </div>
+
+                        <span style="font-size: large;"><strong>平均工時</strong></span>
+                        <hr>
+                        <div style="margin: 0 auto; width: fit-content; margin-bottom: 20;">
+                            <span class="statistic-loading" id="worktime-avg-running"><span>統計中...</span></span>
+                            <span class="statistic" id="worktime-avg"><span id="worktime-avg-text"></span>小時</span>
+                        </div>
+
+                        <span style="font-size: large;"><strong>最多符合條件工作的地區</strong></span>
+                        <hr>
+                        <div style="margin: 0 auto; width: fit-content; margin-bottom: 20;">
+                            <span class="statistic-loading" id="area-max-running"><span>統計中...</span></span>
+                            <div class="statistic" id="area-max">
+                                <div style="text-align: center;"><span>縣市：</span><span id="area-cc-max"></span></div>
+                                <div style="text-align: center;"><span>鄉鎮區：</span><span id="area-cctd-max"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

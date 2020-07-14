@@ -296,7 +296,7 @@ module.exports = {
         return (lo == hi ? lo : '' + (lo ? lo : '') + ' ~ ' + (hi ? hi : ''))
     },
     simpleSearch: function (search, callback) {
-        db.query(this.renderString(this.query_strings.searchSimple, { 'search': search }), (err, res, fields) => {
+        db.query(this.renderString(this.query_strings.simpleSearch, { 'search': search }), (err, res, fields) => {
             if (err)
                 return callback(err)
             fs.readFile(__dirname + '/frontend/component/job-block-suggest.html', (err, component) => {
@@ -313,7 +313,86 @@ module.exports = {
                         'job_id': res[row].job_id
                     })
                 }
-                callback(null, resComp)
+                callback(null, resComp, res.length)
+            })
+        })
+    },
+    advanceSearch: function (search, callback, extraCallback) {
+        queryBase = this.renderString(this.query_strings.advanceSearch, data)
+        db.query(queryBase, (err, res, fields) => {
+            if (err)
+                return callback(err)
+            fs.readFile(__dirname + '/frontend/component/job-block-suggest.html', (err, component) => {
+                if (err)
+                    return callback(err)
+                resComp = ''
+                for (row in res) {
+                    resComp += this.renderString(component, {
+                        'job_name': res[row].job_name,
+                        'pos_field': res[row].pos_field,
+                        'pos_name': res[row].pos_name,
+                        'salary': this.castSalaryString(res[row].low_salary, res[row].high_salary),
+                        'area_cctd': res[row].area_cctd_name,
+                        'job_id': res[row].job_id
+                    })
+                }
+                callback(null, resComp, res.length)
+                queryBase = queryBase.substr(0, queryBase.length - 1)
+                db.query(this.renderString(this.query_strings.statisticSalary, { base: queryBase }), (err, res, fields) => {
+                    if (!err) {
+                        if (res.length > 0) {
+                            extraCallback('salary-avg', res[0].avg)
+                            extraCallback('salary-max', res[0].max)
+                            extraCallback('salary-min', res[0].min)
+                        }
+                        else {
+                            extraCallback('salary-avg', 0)
+                            extraCallback('salary-max', 0)
+                            extraCallback('salary-min', 0)
+                        }
+                    }
+                })
+                db.query(this.renderString(this.query_strings.statisticExpyear, { base: queryBase }), (err, res, fields) => {
+                    if (!err) {
+                        if (res.length > 0) {
+                            extraCallback('exp-avg', res[0].avg)
+                        }
+                        else {
+                            extraCallback('exp-avg', 0)
+                        }
+                    }
+                })
+                db.query(this.renderString(this.query_strings.statisticWorktime, { base: queryBase }), (err, res, fields) => {
+                    if (!err) {
+                        if (res.length > 0) {
+                            extraCallback('worktime-avg', res[0].avg)
+                        }
+                        else {
+                            extraCallback('worktime-avg', 0)
+                        }
+                    }
+                })
+                db.query(this.renderString(this.query_strings.statisticAreaCC, { base: queryBase }), (err, res, fields) => {
+                    if (!err) {
+                        if (res.length > 0) {
+                            cc = res[0].area_cc_name
+                            db.query(this.renderString(this.query_strings.statisticAreaCC, { base: queryBase }), (err, res, fields) => {
+                                if (!err) {
+                                    cc = res[0].area_cc_name
+                                    db.query(this.renderString(this.query_strings.statisticAreaCCTD, { base: queryBase }), (err, res, fields) => {
+                                        if (!err) {
+                                            cctd = res[0].area_cctd_name
+                                            extraCallback('area', JSON.stringify({ cc: cc, cctd: cctd }))
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                        else {
+                            extraCallback('area', JSON.stringify({ cc: '', cctd: '' }))
+                        }
+                    }
+                })
             })
         })
     }
@@ -333,7 +412,13 @@ module.exports = {
         suggestionArea: 'SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, t.area_cctd_name, p.pos_field, p.pos_name FROM (SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, l.area_cctd_name, t.pos_id FROM (SELECT t.job_id, j.job_name, j.low_salary, j.high_salary, t.area_id, t.pos_id FROM (SELECT * FROM job WHERE area_id = ${area_id} AND job_id != ${job_id}) AS t, jobinfo j WHERE j.job_id = t.job_id) AS t, localarea AS l WHERE t.area_id = l.area_id) AS t, position p WHERE t.pos_id = p.pos_id ORDER BY RAND() LIMIT 5;',
         compInfo: 'select * from company where com_id = ${com_id};',
         compJobs: 'SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, t.area_cctd_name, p.pos_field, p.pos_name FROM (SELECT t.job_id, t.job_name, t.low_salary, t.high_salary, l.area_cctd_name, t.pos_id FROM (SELECT t.job_id, j.job_name, j.low_salary, j.high_salary, t.area_id, t.pos_id FROM (SELECT * FROM job WHERE com_id = ${com_id}) AS t, jobinfo j WHERE j.job_id = t.job_id) AS t, localarea AS l WHERE t.area_id = l.area_id) AS t, position p WHERE t.pos_id = p.pos_id;',
-        searchSimple: 'SELECT t.*, p.pos_field, p.pos_name, l.area_cctd_name FROM (SELECT job.job_id, job.pos_id AS pos_id, job.area_id AS area_id, jobinfo.job_name, company.com_name, jobinfo.low_salary, jobinfo.high_salary FROM jobinfo, company, job WHERE jobinfo.job_id = job.job_id AND job.com_id = company.com_id AND ((jobinfo.job_name LIKE CONCAT("%", "${search}", "%")) OR (company.com_name LIKE CONCAT("%", "${search}", "%")))) AS t, position p, localarea l WHERE t.pos_id = p.pos_id AND t.area_id = l.area_id;'
+        simpleSearch: 'SELECT t.*, p.pos_field, p.pos_name, l.area_cctd_name FROM (SELECT job.job_id, job.pos_id AS pos_id, job.area_id AS area_id, jobinfo.job_name, company.com_name, jobinfo.low_salary, jobinfo.high_salary FROM jobinfo, company, job WHERE jobinfo.job_id = job.job_id AND job.com_id = company.com_id AND ((jobinfo.job_name LIKE CONCAT("%", "${search}", "%")) OR (company.com_name LIKE CONCAT("%", "${search}", "%")))) AS t, position p, localarea l WHERE t.pos_id = p.pos_id AND t.area_id = l.area_id;',
+        advanceSearch: 'SELECT j.job_id, jobinfo.job_name, jobinfo.low_salary, jobinfo.high_salary, IF((jobinfo.high_salary is NULL), jobinfo.low_salary, ((jobinfo.low_salary+jobinfo.high_salary)/2)) as _salary, jobinfo.worktime, jobinfo.exp_year, position.pos_field, position.pos_name, j.area_cc_name, j.area_cctd_name FROM jobinfo, position, company, (SELECT job.job_id, job.com_id, job.pos_id, localarea.area_cc_name, localarea.area_cctd_name FROM job, localarea WHERE job.area_id = localarea.area_id AND (("${area_cc}" = "") OR ("${area_cc}" = localarea.area_cc_name)) AND (("${area_td}" = "") OR ("${area_td}" = localarea.area_td_name))) AS j WHERE j.job_id = jobinfo.job_id AND j.com_id = company.com_id AND ((${degree} IS NULL) OR (${degree} >= jobinfo.degree)) AND ((${exp_year} IS NULL) OR (${exp_year} >= jobinfo.exp_year)) AND ((${worktime} IS NULL) OR (${worktime} >= jobinfo.worktime)) AND (${is_night} = 3 OR ${is_night} = jobinfo.is_night) AND (jobinfo.needed_num > 0) AND (${job_type} = jobinfo.job_type) AND ((${salary} IS NULL) OR ((jobinfo.high_salary IS NULL AND jobinfo.low_salary >= ${salary}) OR (jobinfo.low_salary >= ${salary}))) AND ((jobinfo.job_name LIKE CONCAT("%", "${search}", "%")) OR (company.com_name LIKE CONCAT("%", "${search}", "%"))) AND j.pos_id = position.pos_id AND (("${pos_name}" = "") OR ("${pos_name}" = position.pos_name)) AND (("${pos_field}" = "") OR ("${pos_field}" = position.pos_field));',
+        statisticSalary: 'SELECT AVG(_salary) AS avg, MAX(_salary) AS max, MIN(_salary) AS min FROM (${base}) as t;',
+        statisticExpyear: 'SELECT AVG(exp_year) as avg FROM (${base}) as t;',
+        statisticWorktime: 'SELECT AVG(worktime) as avg FROM (${base}) as t;',
+        statisticAreaCC: 'SELECT area_cc_name FROM (${base}) as t GROUP BY area_cc_name ORDER BY COUNT(*) DESC LIMIT 1;',
+        statisticAreaCCTD: 'SELECT area_cctd_name FROM (${base}) as t GROUP BY area_cctd_name ORDER BY COUNT(*) DESC LIMIT 1;'
     },
     degree_table: ['不拘', '國中', '高中職', '專科', '大學', '碩士', '博士']
 }
